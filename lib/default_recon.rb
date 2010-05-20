@@ -25,8 +25,6 @@ module DefaultRecon
 		end
 	end
 	
-	private
-	
 	# Reconstructs a scan from dicoms to nifti, anatomical or functional.	 Uses a scan_spec hash to drive.
 	# Writes the result in current working directory. Raises an error if to3d system call fails.
 	# Conventions: I****.dcm filenaming, I0002.dcm is second file in series, 
