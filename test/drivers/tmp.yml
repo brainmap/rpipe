@@ -1,0 +1,59 @@
+subid: mrt00015
+rawdir: /Data/vtrak1/raw/johnson.merit220.visit1/mrt00015_642_02112010/dicoms
+origdir: /Data/vtrak1/preprocessed/visits/johnson.merit220.visit1/mrt00015/fmri
+procdir: /Data/vtrak1/preprocessed/visits/johnson.merit220.visit1/mrt00015/stats
+
+jobs:
+  
+  - step: reconstruct
+    method: wadrc_default
+    alt_path: /Data/mri_studies/swallow/stroke/analyses/kris/pipetest/raw/Swallow003/01
+    scans:
+      - dir: "002"
+        type: anat
+        label: v01_T1
+        z_slices: 106
+      - dir: "003"
+        type: func
+        label: v01_sw01
+        task: bolus
+        bold_reps: 148
+        z_slices: 30
+      - dir: "004"
+        type: func
+        label: v01_sw02
+        task: bolus
+        bold_reps: 148
+        z_slices: 30
+      - dir: "005"
+        type: func
+        label: v01_sw03
+        task: bolus
+        bold_reps: 148
+        z_slices: 30
+      - dir: "006"
+        type: func
+        label: v01_pr01
+        task: press
+        bold_reps: 89
+        z_slices: 30
+      - dir: "007"
+        type: func
+        label: v01_pr02
+        task: press
+        bold_reps: 89
+        z_slices: 30
+        
+  - step: preprocess
+    template_spec:
+      job: template_pipetest_spatial_preproc.mat
+      subid: Swallow003
+      
+  - step: stats
+    onsets_files:
+      - Swallow003_v01_sw01_onsets.mat
+      - Swallow003_v01_sw02_onsets.mat
+      - Swallow003_v01_sw03_onsets.mat
+    template_spec:
+      job: template_stats.mat
+      subid: Swallow003
