@@ -21,6 +21,22 @@ class JobStep
 		@procdir = job_spec['procdir'] || workflow_spec['procdir']
 		@spmdir = job_spec['spmdir'] || workflow_spec['spmdir']
 		@collision_policy = (job_spec['collision'] || workflow_spec['collision'] || COLLISION_POLICY).to_sym
+		
+		include_job_methods(job_spec['method'])
+	end
+	
+	def include_job_methods(method)
+		if method.nil? or ['default','wadrc'].include?(method)
+			# do nothing, use default preproc implementation
+		else
+			custom_method_file = File.join('custom_methods', method + '.rb')
+			if File.exist? custom_method_file
+			  require custom_method_file
+			  send(:extend, self.class.const_get(method))
+		  else
+		    raise ScriptError, "Can't find custom method file #{custom_method_file}."
+		  end
+		end
 	end
 	
 	# displays a message and the date/time to standard output.
