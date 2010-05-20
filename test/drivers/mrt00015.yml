@@ -26,7 +26,7 @@ jobs:
         z_slices: 36
         
   - step: preprocess
-    method: johnson.merit220.visit1.preproc
+    method: Merit220Preproc
     template_spec:
       job: template_pipetest_spatial_preproc.mat
       subid: Swallow003

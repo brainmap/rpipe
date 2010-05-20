@@ -29,7 +29,7 @@ class JobStep
 		if method.nil? or ['default','wadrc'].include?(method)
 			# do nothing, use default preproc implementation
 		else
-			custom_method_file = File.join('custom_methods', method + '.rb')
+			custom_method_file = File.join(File.dirname(__FILE__), 'custom_methods', method + '.rb')
 			if File.exist? custom_method_file
 			  require custom_method_file
 			  send(:extend, self.class.const_get(method))
