@@ -1,0 +1,41 @@
+subid: mrt00015
+rawdir: /tmp/mrt00015
+origdir: /tmp/mrt00015_orig
+procdir: /tmp/mrt00015_proc
+collision: destroy
+
+jobs:
+  - step: reconstruct
+    method: ReconWithHello
+    scans:
+      - dir: s07_epi
+        type: func
+        label: task1
+        task: Faces3A
+        bold_reps: 167
+        z_slices: 36
+      - dir: s08_epi
+        type: func
+        label: task2
+        task: Faces3B
+        bold_reps: 167
+        z_slices: 36
+      - dir: s09_epi
+        type: func
+        label: rest
+        bold_reps: 167
+        z_slices: 36
+        
+  - step: preprocess
+    template_spec:
+      job: template_pipetest_spatial_preproc.mat
+      subid: Swallow003
+      
+  - step: stats
+    onsets_files:
+      - Swallow003_v01_sw01_onsets.mat
+      - Swallow003_v01_sw02_onsets.mat
+      - Swallow003_v01_sw03_onsets.mat
+    template_spec:
+      job: template_stats.mat
+      subid: Swallow003

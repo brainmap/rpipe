@@ -9,9 +9,9 @@ module DefaultPreproc
 		
 		Dir.chdir(@procdir) do
 			link_files_into_proc
-			#customize_templates
-			#run_spm_jobs
-			#deal_with_motion
+			customize_templates
+			run_spm_jobs
+			deal_with_motion
 		end
 	end
 	
