@@ -24,7 +24,4 @@ module Merit220Preproc
     '/private/tmp/mrt00015_orig/mrt00015_preproc_job.m')"
   end
   
-  def run_matlab_queue(queue)
-    system("matlab -nosplash -nodesktop -r \"#{ queue.join('; ') }; exit\" ")
-  end
 end
