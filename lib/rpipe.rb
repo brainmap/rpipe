@@ -15,17 +15,20 @@ class JobStep
 	
 	attr_accessor :subid, :rawdir, :origdir, :procdir, :spmdir, :collision_policy
 	
+	# Intialize with two configuration option hashes - workflow_spec and job_spec
 	def initialize(workflow_spec, job_spec)
 		# allow jobspec to override the workflow spec
-		@subid   = job_spec['subid']   || workflow_spec['subid']
-		@rawdir  = job_spec['rawdir']  || workflow_spec['rawdir']
-		@origdir = job_spec['origdir'] || workflow_spec['origdir']
-		@procdir = job_spec['procdir'] || workflow_spec['procdir']
-		@spmdir = job_spec['spmdir'] || workflow_spec['spmdir']
+		@subid    = job_spec['subid']     || workflow_spec['subid']
+		@rawdir   = job_spec['rawdir']    || workflow_spec['rawdir']
+		@origdir  = job_spec['origdir']   || workflow_spec['origdir']
+		@procdir  = job_spec['procdir']   || workflow_spec['procdir']
+		@statsdir = job_spec['statsdir']  || workflow_spec['statsdir']
+		@spmdir   = job_spec['spmdir']    || workflow_spec['spmdir']
 		@collision_policy = (job_spec['collision'] || workflow_spec['collision'] || COLLISION_POLICY).to_sym
 		include_custom_methods(job_spec['method'])
 	end
 	
+	# Dynamically load custom methods for advanced processing.
 	def include_custom_methods(module_name)
 		if module_name.nil? or ['default','wadrc'].include?(module_name)
 			# do nothing, use default implementation
@@ -45,6 +48,7 @@ class JobStep
 		puts
 	end
 	
+	# Setup directory path according to collision policy.
 	def setup_directory(path, logging_tag)
 		if File.exist?(path)
 			if @collision_policy == :destroy
@@ -62,8 +66,15 @@ class JobStep
 		end
 	end
 	
+	# Format and run Matlab queue
 	def run_matlab_queue(queue)
+    flash queue
     system("matlab -nosplash -nodesktop -r \"#{ queue.join('; ') }; exit\" ")
+  end
+  
+  # Wrap argument paths in properly formatted matlab addpath commands.
+  def add_matlab_paths(*args)
+    args.collect {|path| "addpath(genpath('#{path}'))"}.join('; ') + '; '
   end
 	
 end
@@ -89,6 +100,10 @@ class Reconstruction < JobStep
 		@scans = recon_spec['scans']
 		@volume_skip = recon_spec['volume_skip'] || VOLUME_SKIP
 	end
+	
+	def run
+	  recon_visit
+  end
 
 end
 ###############################################	 END OF CLASS	 #########################################################
@@ -115,6 +130,10 @@ class Preprocessing < JobStep
 		@tspec = preproc_spec['template_spec']
 		@motion_threshold = preproc_spec['motion_threshold'] || MOTION_THRESHOLD
 	end
+	
+	def run
+	  preproc_visit
+  end
 
 end
 ###############################################	 END OF CLASS	 #########################################################
@@ -137,7 +156,12 @@ class Stats < JobStep
 		super(workflow_spec, stats_spec)
 		@tspec = stats_spec['template_spec']
 		@onsetsfiles = stats_spec['onsetsfiles']
+		@regressorsfiles = stats_spec['regressorsfiles']
 	end
+	
+	def run
+	  run_first_level_stats
+  end
 	
 end
 ###############################################	 END OF CLASS	 #########################################################
@@ -175,6 +199,10 @@ class RPipe
 			@preproc_jobs << Preprocessing.new(@workflow_spec, job_params)  if job_params['step'] == 'preprocess'
 			@stats_jobs   << Stats.new(@workflow_spec, job_params)          if job_params['step'] == 'stats'
 		end
+		
+		def jobs
+		  [@recon_jobs, @preproc_jobs, @stats_jobs].flatten
+	  end
 	end
 	
 end

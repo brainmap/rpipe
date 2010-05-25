@@ -1,6 +1,7 @@
 %-----------------------------------------------------------------------
 % Job configuration created by cfg_util (rev $Rev: 3599 $)
 %-----------------------------------------------------------------------
+SPM_DIR = '/Applications/spm/spm8/spm8_current/';
 matlabbatch{1}.spm.spatial.realign.estimate.data = {
                                                     '<UNDEFINED>'
                                                     '<UNDEFINED>'
@@ -50,7 +51,7 @@ matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(3).tgt_spec{1}(2).va
 matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(3).sname = 'Realign: Estimate: Realigned Images (Sess 3)';
 matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(3).src_exbranch = substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1});
 matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(3).src_output = substruct('.','sess', '()',{3}, '.','cfiles');
-matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.template = {'/Applications/spm/spm8/spm8_current/templates/EPI.nii,1'};
+matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.template = {strcat(SPM_DIR, 'templates/EPI.nii,1')};
 matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.weight = '';
 matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.smosrc = 8;
 matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.smoref = 0;

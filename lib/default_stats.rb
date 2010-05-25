@@ -15,9 +15,7 @@ module DefaultStats
 	end
 	
 	# Links all the files necessary from the "proc" directory. Links written to current working directory.
-	def link_files_from_proc_directory
-		images_wildcard = File.join(@procdir, "swa*.nii")
-		motion_regressors_wildcard = File.join(@procdir, "md_rp*.txt")
+	def link_files_from_proc_directory(images_wildcard = File.join(@procdir, "swq*.nii"), motion_regressors_wildcard = File.join(@procdir, "md_rp*.txt"))
 		system("ln -s #{images_wildcard} #{@statsdir}")
 		system("ln -s #{motion_regressors_wildcard} #{@statsdir}")
 	end
@@ -27,8 +25,9 @@ module DefaultStats
 	# Link is written to current working directory.
 	def link_onsets_files
 		@onsetsfiles.each do |ofile|
-			opath = File.join(@studydir, 'onsets', ofile)
-			system("ln -s #{opath} #{@procdir}")
+			# Check if File Path is Absolute.  If not link from procdir/onsets
+			opath = File.expand_path(ofile) == ofile ? ofile : File.join(@procdir, 'onsets', ofile)
+			system("ln -s #{File.expand_path(opath)} #{Dir.pwd}")
 		end
 	end
 	

@@ -1,4 +1,4 @@
-function [] = merit_preproc(studypath, images, image_boldreps, job_mfile)
+function [] = Merit220Preproc(studypath, images, image_boldreps, job_mfile)
 % [] = merit_preproc Calls and runs Merit220 preproc job.
 % merit_preproc('/private/tmp/mrt00015_orig/', ...
 % {'amrt00015_task1.nii' 'amrt00015_task2.nii' 'amrt00015_rest.nii'}, ...
@@ -11,17 +11,13 @@ function [] = merit_preproc(studypath, images, image_boldreps, job_mfile)
 % Realign: Estimate: Session - cfg_files
 % Realign: Estimate: Session - cfg_files
 nrun = 1; % enter the number of runs here
-jobfile = {job_mfile}
+jobfile = {job_mfile};
 jobs = repmat(jobfile, 1, nrun);
 inputs = cell(3, nrun);
 
 for crun = 1:nrun
     for index = 1:length(images)
-        vols = {};
-        for vol = 1:image_boldreps{index}
-            vols{vol} = strcat(studypath, images{index}, ',', int2str(vol))
-        end
-        inputs{index, crun} = vols % Realign: Estimate: Session - cfg_files
+			inputs{index, crun} = CreateFunctionalVolumeStruct(studypath, images{index}, image_boldreps{index}); % Realign: Estimate: Session - cfg_files
     end
 end
 spm('defaults', 'FMRI');
