@@ -1,13 +1,12 @@
-subid: mrt00015
-rawdir: /Data/vtrak1/raw/johnson.merit220.visit1/mrt00015_642_02112010/dicoms
-origdir: /Data/vtrak1/preprocessed/visits/johnson.merit220.visit1/mrt00015/fmri
-procdir: /Data/vtrak1/preprocessed/visits/johnson.merit220.visit1/mrt00015/stats
+subid: Swallow003
+rawdir: /Data/mri_studies/swallow/stroke/analyses/kris/pipetest/raw/Swallow003
+origdir: /Data/mri_studies/swallow/stroke/analyses/kris/pipetest/orig/Swallow003
+procdir: /Data/mri_studies/swallow/stroke/analyses/kris/pipetest/proc/Swallow003
+spmdir: /Data/mri_studies/swallow/stroke/analyses/kris/pipetest/spmjobs
 
 jobs:
-  
   - step: reconstruct
-    method: wadrc_default
-    alt_path: /Data/mri_studies/swallow/stroke/analyses/kris/pipetest/raw/Swallow003/01
+    rawdir: /Data/mri_studies/swallow/stroke/analyses/kris/pipetest/raw/Swallow003/01
     scans:
       - dir: "002"
         type: anat

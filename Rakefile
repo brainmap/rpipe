@@ -5,11 +5,11 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "rpipe"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{Neuroimaging preprocessing the Ruby way}
+    gem.description = %Q{Neuroimaging preprocessing the Ruby way}
     gem.email = "kjkosmatka@gmail.com"
-    gem.homepage = "http://github.com/kjkosmatka/rpipe"
-    gem.authors = ["Kristopher Kosmatka"]
+    gem.homepage = "http://github.com/brainmap/rpipe"
+    gem.authors = ["Kristopher Kosmatka", "Erik Kastman"]
     gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end

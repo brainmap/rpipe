@@ -15,6 +15,8 @@ module DefaultPreproc
 		end
 	end
 	
+	alias_method :perform, :preproc_visit
+	
 	# Links all the slice timing corrected data from the source "orig" directory using a wildcard a${subid}*.nii,
 	# where subid is the subject id specified in the preproc_spec hash.
 	def link_files_into_proc
