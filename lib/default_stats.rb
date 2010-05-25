@@ -14,6 +14,8 @@ module DefaultStats
 		
 	end
 	
+	alias_method :perform, :run_first_level_stats
+	
 	# Links all the files necessary from the "proc" directory. Links written to current working directory.
 	def link_files_from_proc_directory
 		images_wildcard = File.join(@procdir, "swa*.nii")

@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
+require 'trollop'
+require 'rpipe'
+require 'pp'
+
+VERSION_NUMBER = "0.0.0"
+VERSION_LINE = "rpipe %s WADRC Imaging Core" % VERSION_NUMBER
+BANNER = <<-EOS
+A utility for running neuroimaging rpipe jobs.
+
+Usage: rpipe [options] <driver>
+EOS
+STEPS = %w(recon preproc stats)
+
+opts = Trollop::options do
+	version VERSION_LINE
+	banner BANNER
+	opt :only, "Perform only a certain step (recon, preproc, stats)", :type => String
+	opt :debug, "Be more wordy than usual for debugging"
+end
+
+if opts[:only_given]
+	unless STEPS.include?(opts[:only])
+		Trollop::die :only, "must be one of recon, preproc, or stats"
+	end
+end
+
+Trollop::die "Driver file not given" if (ARGV.size < 1)
+driver = ARGV.shift
+Trollop::die :driver, "file does not exist" unless File.exist?(driver)
+
+pp opts if opts[:debug]
+pipe = RPipe.new(driver)
+pp pipe if opts[:debug]
+
+
+if opts[:only_given]
+	case opts[:only]
+	when "recon"
+		pipe.recon_jobs.each { |job| job.perform }
+	when "preproc"
+		pipe.preproc_jobs.each { |job| job.perform }
+	when "stats"
+		pipe.stats_jobs.each { |job| job.perform }
+	end
+else
+	pipe.recon_jobs.each { |job| job.perform }
+	pipe.preproc_jobs.each { |job| job.perform }
+	pipe.stats_jobs.each { |job| job.perform }
+end
+
+

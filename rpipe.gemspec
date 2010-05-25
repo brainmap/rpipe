@@ -10,10 +10,9 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kristopher Kosmatka", "Erik Kastman"]
   s.date = %q{2010-05-24}
-  s.default_executable = %q{swallow_batch_run.rb}
   s.description = %q{Neuroimaging preprocessing the Ruby way}
   s.email = %q{kjkosmatka@gmail.com}
-  s.executables = ["swallow_batch_run.rb"]
+  s.executables = ["rpipe", "swallow_batch_run.rb"]
   s.extra_rdoc_files = [
     "LICENSE",
      "README",
@@ -27,6 +26,7 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION",
+     "bin/rpipe",
      "bin/swallow_batch_run.rb",
      "lib/custom_methods/Merit220Preproc.m",
      "lib/custom_methods/Merit220Preproc.rb",
@@ -36,6 +36,8 @@ Gem::Specification.new do |s|
      "lib/default_recon.rb",
      "lib/default_stats.rb",
      "lib/rpipe.rb",
+     "lib/trollop.rb",
+     "rpipe.gemspec",
      "test/drivers/mrt00015.yml",
      "test/drivers/mrt00015_hello.yml",
      "test/drivers/tmp.yml",
