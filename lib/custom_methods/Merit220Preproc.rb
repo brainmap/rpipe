@@ -13,6 +13,8 @@ module Merit220Preproc
 		end
 	end
 	
+	alias_method :perform, :preproc_visit
+	
 	private
 	
 	def matlab_queue
@@ -26,7 +28,7 @@ module Merit220Preproc
 
 	  queue << "Merit220Preproc('#{@procdir}/', \
     { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \
-    { 164 164 164}, \
+    { #{@bold_reps.join(' ') }, \
     'Merit220Preproc_job.m')"
   end
   

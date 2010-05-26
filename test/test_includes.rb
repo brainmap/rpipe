@@ -6,5 +6,6 @@ class TestIncludes < Test::Unit::TestCase
 			{ 'subid' => 'swallow001', 'rawdir' => nil, 'origdir' => nil, 'procdir' => nil },
 			{ 'scans' => nil, 'source' => nil, 'method' => nil }
 		)
+		assert_equal "swallow001", r.subid
   end
 end

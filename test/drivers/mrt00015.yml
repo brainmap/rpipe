@@ -2,6 +2,7 @@ subid: mrt00015
 rawdir: /tmp/mrt00015
 origdir: /tmp/mrt00015_orig
 procdir: /tmp/mrt00015_proc
+statsdir: /tmp/mrt00015_stats
 collision: destroy
 
 jobs:
@@ -27,15 +28,19 @@ jobs:
         
   - step: preprocess
     method: Merit220Preproc
-    template_spec:
-      job: template_pipetest_spatial_preproc.mat
-      subid: Swallow003
+    bold_reps:
+      - 164
+      - 164
+      - 164
       
   - step: stats
-    onsets_files:
-      - Swallow003_v01_sw01_onsets.mat
-      - Swallow003_v01_sw02_onsets.mat
-      - Swallow003_v01_sw03_onsets.mat
-    template_spec:
-      job: template_stats.mat
-      subid: Swallow003
+    method: Merit220Stats
+    onsetsfiles:
+      - /tmp/mrt00015/onsets/mrt00015_faces3_recognitionA.mat
+      - /tmp/mrt00015/onsets/mrt00015_faces3_recognitionB.mat
+    regressorsfiles:
+      - rp_amrt00015_task1.txt
+      - rp_amrt00015_task2.txt
+    bold_reps:
+      - 164
+      - 164

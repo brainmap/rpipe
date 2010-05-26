@@ -1,7 +1,7 @@
 module ReconWithHello
 	
 	def hello
-		puts "=== Hello World! ==="
+		"=== Hello World! ==="
 	end
 	
 end

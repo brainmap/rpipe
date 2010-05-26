@@ -10,8 +10,9 @@ module Merit220Stats
 			link_onsets_files
 			run_stats_spm_job
 		end
-		
 	end
+
+	alias_method :perform, :run_first_level_stats
 
   # Finally runs the stats job 
   def run_stats_spm_job
@@ -28,7 +29,7 @@ module Merit220Stats
     )
     queue << "Merit220Stats('#{@statsdir}/', \
     { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \
-    { 164 164 }, \
+    { #{@bold_reps.join(' ') } }, \
     { #{@onsetsfiles.collect { |file| "'#{File.basename(file)}'"}.join(' ') } }, \
     { #{@regressorsfiles.collect { |file| "'#{File.basename(file)}'"}.join(' ') } }, \
     '/private/tmp/mrt00015_stats/Merit220Stats_job.m')"
