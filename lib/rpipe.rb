@@ -100,10 +100,6 @@ class Reconstruction < JobStep
 		@scans = recon_spec['scans']
 		@volume_skip = recon_spec['volume_skip'] || VOLUME_SKIP
 	end
-	
-	def run
-	  recon_visit
-  end
 
 end
 ###############################################	 END OF CLASS	 #########################################################
@@ -130,10 +126,6 @@ class Preprocessing < JobStep
 		@tspec = preproc_spec['template_spec']
 		@motion_threshold = preproc_spec['motion_threshold'] || MOTION_THRESHOLD
 	end
-	
-	def run
-	  preproc_visit
-  end
 
 end
 ###############################################	 END OF CLASS	 #########################################################
@@ -158,10 +150,6 @@ class Stats < JobStep
 		@onsetsfiles = stats_spec['onsetsfiles']
 		@regressorsfiles = stats_spec['regressorsfiles']
 	end
-	
-	def run
-	  run_first_level_stats
-  end
 	
 end
 ###############################################	 END OF CLASS	 #########################################################
