@@ -19,11 +19,11 @@ require 'pp'
 
 class TestJohnsonMerit220Integrative < Test::Unit::TestCase
   should "run through a subject." do
-    pipe = RPipe.new('drivers/mrt00015.yml')
+    pipe = RPipe.new(File.join(File.dirname(__FILE__), 'drivers', '/mrt00015_hello.yml'))
 
     # Run Each Job
     pipe.jobs.each do |job|
-      job.run
+      job.perform
     end
 
   end

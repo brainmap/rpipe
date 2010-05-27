@@ -13,7 +13,7 @@ class JobStep
 	
 	COLLISION_POLICY = :panic # options -- :panic, :destroy, :overwrite
 	
-	attr_accessor :subid, :rawdir, :origdir, :procdir, :spmdir, :collision_policy
+	attr_accessor :subid, :rawdir, :origdir, :procdir, :statsdir, :spmdir, :collision_policy
 	
 	# Intialize with two configuration option hashes - workflow_spec and job_spec
 	def initialize(workflow_spec, job_spec)
@@ -178,9 +178,7 @@ class RPipe
 		@stats_jobs = []
 		
 		raise(IOError, "Driver file not found: #{driver_file}") unless File.exist?(driver_file)
-		File.open(driver_file) do |yf|
-			@workflow_spec = YAML.load(yf)
-		end
+		@workflow_spec = YAML.load_file(driver_file)
 		
 		jobs = @workflow_spec['jobs']
 		
