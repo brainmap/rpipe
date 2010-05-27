@@ -67,13 +67,13 @@ class JobStep
 	end
 	
 	# Format and run Matlab queue
-	def run_matlab_queue(queue)
-    flash queue
+	def self.run_matlab_queue(queue)    
+    puts queue.join('; ')
     system("matlab -nosplash -nodesktop -r \"#{ queue.join('; ') }; exit\" ")
   end
   
   # Wrap argument paths in properly formatted matlab addpath commands.
-  def add_matlab_paths(*args)
+  def self.add_matlab_paths(*args)
     args.collect {|path| "addpath(genpath('#{path}'))"}.join('; ') + '; '
   end
 	

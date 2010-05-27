@@ -1,16 +1,16 @@
-function [] = prepare_onsets_xls(filename)
+function [] = prepare_onsets_xls(csvfile, matfileprefix, conditions)
 %IMPORTFILE(FILETOREAD1)
 %  Imports data from the specified file
 %  FILETOREAD1:  file to read
 
-import_csv(filename)
+import_csv(csvfile);
 
-names{1}='new';
-onsets{1}=new;
-durations{1}=[0];
+for i = 1:length(conditions)
+	condition = conditions{i};
+	
+	names{i}=condition;
+	onsets{i} = eval(condition);
+	durations{i}=[0];
+end
 
-names{2}='old';
-onsets{2}=old
-durations{2}=[0];
-
-save([filename,'.mat'],'names','onsets', 'durations');
+save([matfileprefix,'.mat'],'names','onsets', 'durations');

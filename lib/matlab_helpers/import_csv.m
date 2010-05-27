@@ -10,6 +10,6 @@ newData1 = importdata(fileToRead1);
 
 % Create new variables in the base workspace from those fields.
 for i = 1:size(newData1.colheaders, 2)
-    assignin('base', genvarname(newData1.colheaders{i}), newData1.data(:,i));
+    assignin('caller', genvarname(newData1.colheaders{i}), newData1.data(:,i));
 end
 

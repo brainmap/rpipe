@@ -38,9 +38,23 @@ rescue LoadError
   end
 end
 
+begin
+  require 'spec/rake/spectask'
+  Spec::Rake::SpecTask.new do |test|
+    test.warning = true
+    # test.rcov = true
+    test.spec_files = FileList['spec/**/spec_*.rb']
+  end
+rescue LoadError
+  task :spec do
+    abort "RSpec is not available.  In order to run specs, you must: sudo gem install rspec"
+  end
+end
+
+
 task :test => :check_dependencies
 
-task :default => :test
+task :default => [:test, :spec]
 
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|

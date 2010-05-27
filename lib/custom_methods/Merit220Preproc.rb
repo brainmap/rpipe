@@ -8,7 +8,9 @@ module Merit220Preproc
 		
 		Dir.chdir(@procdir) do
 			link_files_into_proc
-			run_matlab_queue(matlab_queue)
+			puts self
+      flash self.class.run_matlab_queue(matlab_queue)
+      # flash self.class.run_matlab_queue(["1+2"])
 			deal_with_motion
 		end
 	end
@@ -20,7 +22,7 @@ module Merit220Preproc
 	def matlab_queue
 	  queue = []
 	  images = Dir.glob(File.join(@origdir, "a#{@subid}*.nii"))
-	  queue << add_matlab_paths(
+	  queue << self.class.add_matlab_paths(
       '/Applications/spm/spm8/spm8_current', 
       File.expand_path(File.dirname(__FILE__)), 
       File.expand_path(File.join(File.dirname(__FILE__), '..', 'matlab_helpers'))
@@ -28,7 +30,7 @@ module Merit220Preproc
 
 	  queue << "Merit220Preproc('#{@procdir}/', \
     { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \
-    { #{@bold_reps.join(' ') }, \
+    { #{@bold_reps.join(' ') } }, \
     'Merit220Preproc_job.m')"
   end
   

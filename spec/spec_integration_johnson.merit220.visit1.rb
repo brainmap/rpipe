@@ -3,7 +3,7 @@ require 'pp'
 
 describe "Integration Processing for Johnson.Merit220" do
   before(:all) do
-    @driver_file = File.join(File.dirname(__FILE__), 'drivers/mrt00015.yml')
+    @driver_file = File.join(File.dirname(__FILE__), 'drivers', 'mrt00015.yml')
   end
   
   it "should reconstruct raw data" do
@@ -23,13 +23,6 @@ describe "Integration Processing for Johnson.Merit220" do
     s = pipe.stats_jobs.first
     s.perform
   end
-  
-  it "should run all jobs for test subject." do
-    pipe = RPipe.new(@driver_file)
-    # Run Each Job
-    pipe.jobs.each do |job|
-      job.perform
-    end
-  end
+
 end
 
