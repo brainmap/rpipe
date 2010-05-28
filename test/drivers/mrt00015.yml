@@ -1,8 +1,8 @@
 subid: mrt00015
-rawdir: /tmp/mrt00015
-origdir: /tmp/mrt00015_orig
-procdir: /tmp/mrt00015_proc
-statsdir: /tmp/mrt00015_stats
+rawdir: /Data/scratch/mrt00015
+origdir: /Data/scratch/mrt00015_orig
+procdir: /Data/scratch/mrt00015_proc
+statsdir: /Data/scratch/mrt00015_stats
 collision: destroy
 
 jobs:
@@ -35,12 +35,23 @@ jobs:
       
   - step: stats
     method: Merit220Stats
-    onsetsfiles:
-      - /tmp/mrt00015/onsets/mrt00015_faces3_recognitionA.mat
-      - /tmp/mrt00015/onsets/mrt00015_faces3_recognitionB.mat
+    logresponsefiles:
+      - /Volumes/MED-CLUSTER-B.MEDICINE_DATA/team/FMRI/BEHAVIORAL_ANALYSES/CURRENT/johnson.merit220.visit1/Scan/Unprocessed/mrt00015_sep_021110_faces3_recognitionB.txt
+      - /Volumes/MED-CLUSTER-B.MEDICINE_DATA/team/FMRI/BEHAVIORAL_ANALYSES/CURRENT/johnson.merit220.visit1/Scan/Unprocessed/mrt00015_sep_021110_faces3_recognitionA.txt
+      # - /Data/scratch/mrt00015/onsets/mrt00015_sep_021110_faces3_recognitionA.txt
+      # - /Data/scratch/mrt00015/onsets/mrt00015_sep_021110_faces3_recognitionB.txt
+      # This is an ordered list, so put A or B first as appropriate. 
+    # onsetsfiles:
+    #   - /Data/scratch/mrt00015/onsets/mrt00015_faces3_recognitionA.mat
+    #   - /Data/scratch/mrt00015/onsets/mrt00015_faces3_recognitionB.mat
     regressorsfiles:
       - rp_amrt00015_task1.txt
       - rp_amrt00015_task2.txt
+    conditions:
+      - new_correct
+      - new_incorrect
+      - old_correct
+      - old_incorrect
     bold_reps:
       - 164
       - 164

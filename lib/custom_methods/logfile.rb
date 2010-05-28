@@ -6,11 +6,13 @@ require 'pp'
 class Logfile
   
   attr_accessor :textfile_data, :conditions, :csv_filename
+  attr_reader :textfile, :vectors
   
   def initialize(path, *conditions)
     @textfile = path
     @textfile_data = []
     @conditions = conditions
+    raise IOError, "Can't find file #{path}" unless File.exist?(path)
     File.open(path, 'r').each do |line| 
       @textfile_data << line.split(/[\,\:\s]+/).each { |val| val.strip } 
     end
@@ -18,9 +20,9 @@ class Logfile
   end
   
   def to_csv
-    vectors = extract_condition_vectors(@conditions)
-    vectors = zero_and_convert_to_reps(vectors)
-    rows = vectors.values
+    @vectors = extract_condition_vectors(@conditions)
+    @vectors = zero_and_convert_to_reps(vectors)
+    rows = @vectors.values
     rows = pad_array(rows)
     
     output = ""
@@ -51,6 +53,12 @@ class Logfile
     )"
     
     queue.run!
+    
+    return prefix + '.mat'
+  end
+  
+  def <=>(other_logfile)
+    File.stat(@textfile).mtime <=> File.stat(other_logfile.textfile).mtime
   end
   
   private
@@ -60,10 +68,12 @@ class Logfile
     vectors = {}
     @textfile_data.each do |line|
       next if line.empty?
-      puts header = line.first.gsub(/(\(|\))/, '_').downcase.to_sym
+      header = line.first.gsub(/(\(|\))/, '_').downcase.chomp("_").to_sym
       if conditions.include?(header);
-        # puts ">> " + line.join(', ') 
-        vectors[header] = line[2..-1].collect {|val| val.to_f }
+        # Make sure this isn't a column line inside the logfile.
+        if line[1] =~ /time/ 
+          vectors[header] = line[2..-1].collect {|val| val.to_f }
+        end
       end
     end
     

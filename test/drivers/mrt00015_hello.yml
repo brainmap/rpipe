@@ -1,7 +1,7 @@
 subid: mrt00015
-rawdir: /tmp/mrt00015
-origdir: /tmp/mrt00015_orig
-procdir: /tmp/mrt00015_proc
+rawdir: /Data/scratch/mrt00015
+origdir: /Data/scratch/mrt00015_orig
+procdir: /Data/scratch/mrt00015_proc
 collision: destroy
 
 jobs:

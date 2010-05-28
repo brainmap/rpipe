@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'helper_spec'
 require 'pp'
 
 describe "Integration Processing for Johnson.Merit220" do

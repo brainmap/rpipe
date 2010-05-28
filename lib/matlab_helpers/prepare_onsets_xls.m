@@ -9,7 +9,7 @@ for i = 1:length(conditions)
 	condition = conditions{i};
 	condition_onsets = eval(condition);
 		
-	% Strip NaN's
+	% Strip NaN's, but leave one nan if vector is empty (SPM's preference).
 	condition_onsets = condition_onsets(find(~isnan(condition_onsets)));
 	if length(condition_onsets) == 0;
 		condition_onsets=[nan];

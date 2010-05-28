@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'helper_spec'
 require 'matlab_queue'
 require 'pp'
 
