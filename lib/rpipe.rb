@@ -3,6 +3,7 @@ require 'yaml'
 require 'ftools'
 require 'fileutils'
 
+$LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'custom_methods'))
 
 # prevent zipping in FSL programs
@@ -65,17 +66,6 @@ class JobStep
 			FileUtils.mkdir(path)
 		end
 	end
-	
-	# Format and run Matlab queue
-	def self.run_matlab_queue(queue)    
-    puts queue.join('; ')
-    system("matlab -nosplash -nodesktop -r \"#{ queue.join('; ') }; exit\" ")
-  end
-  
-  # Wrap argument paths in properly formatted matlab addpath commands.
-  def self.add_matlab_paths(*args)
-    args.collect {|path| "addpath(genpath('#{path}'))"}.join('; ') + '; '
-  end
 	
 end
 

@@ -16,23 +16,24 @@ module Merit220Stats
 
   # Finally runs the stats job 
   def run_stats_spm_job
-    run_matlab_queue(stats_queue)
-  end
-  
-  def stats_queue
     images = Dir.glob(File.join(@statsdir, "sw*#{@subid}*task*.nii"))
-    queue = []
-    queue << add_matlab_paths(
-      '/Applications/spm/spm8/spm8_current', 
+    raise ScriptError, "Can't find any smoothed, warped images in #{@statsdir}" if images.empty?
+    
+    queue = MatlabQueue.new
+	  queue.paths << ['/Applications/spm/spm8/spm8_current', 
       File.expand_path(File.dirname(__FILE__)), 
       File.expand_path(File.join(File.dirname(__FILE__), '..', 'matlab_helpers'))
-    )
-    queue << "Merit220Stats('#{@statsdir}/', \
+    ]
+
+	  queue << "Merit220Stats('#{@statsdir}/', \
     { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \
     { #{@bold_reps.join(' ') } }, \
     { #{@onsetsfiles.collect { |file| "'#{File.basename(file)}'"}.join(' ') } }, \
     { #{@regressorsfiles.collect { |file| "'#{File.basename(file)}'"}.join(' ') } }, \
-    '/private/tmp/mrt00015_stats/Merit220Stats_job.m')"
+    'Merit220Stats_job.m')"
+    
+    # puts queue.to_s
+    queue.run!
   end
   
 end

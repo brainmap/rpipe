@@ -7,10 +7,18 @@ import_csv(csvfile);
 
 for i = 1:length(conditions)
 	condition = conditions{i};
+	condition_onsets = eval(condition);
+		
+	% Strip NaN's
+	condition_onsets = condition_onsets(find(~isnan(condition_onsets)));
+	if length(condition_onsets) == 0;
+		condition_onsets=[nan];
+	end
 	
-	names{i}=condition;
-	onsets{i} = eval(condition);
-	durations{i}=[0];
+	% Format cell array for SPM's multiple conditions
+	names{i} = condition;
+	onsets{i} = condition_onsets;
+	durations{i} = [0];
 end
 
 save([matfileprefix,'.mat'],'names','onsets', 'durations');
