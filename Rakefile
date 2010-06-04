@@ -11,6 +11,8 @@ begin
     gem.homepage = "http://github.com/brainmap/rpipe"
     gem.authors = ["Kristopher Kosmatka", "Erik Kastman"]
     gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
+    gem.add_dependency "metamri"
+    gem.add_dependency "ruport"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
@@ -43,7 +45,7 @@ begin
   Spec::Rake::SpecTask.new do |test|
     test.warning = true
     # test.rcov = true
-    test.spec_files = FileList['spec/**/spec_*.rb']
+    test.spec_files = FileList['spec/**/*_spec.rb']
   end
 rescue LoadError
   task :spec do
@@ -54,7 +56,7 @@ end
 
 task :test => :check_dependencies
 
-task :default => [:test, :spec]
+task :default => [:spec, :test]
 
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|

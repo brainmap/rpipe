@@ -8,27 +8,48 @@ module Merit220Stats
 		flash "Highway to the dangerzone..."
 		setup_directory(@statsdir, "STATS")
 		
-		@conditions = DEFAULT_CONDITIONS if @conditions.nil?
-		
 		Dir.chdir(@statsdir) do
 			link_files_from_proc_directory(File.join(@procdir, "sw*.nii"), File.join(@procdir, "rp*.txt"))
-			if @onsetsfiles.nil? && !@logresponsefiles.nil?
-			  @onsetsfiles = create_onsets_files(@logresponsefiles, conditions)
-		  else
-			  raise ScriptError, "Multiple conditions cannot be calculated because both log response files and onsets mat files haven't been defined."
-			end 
-			link_onsets_files
+			setup_onsets			
 			run_stats_spm_job
 		end
 	end
 
 	alias_method :perform, :run_first_level_stats
 	
+	def setup_onsets
+	  setup_conditions
+    create_or_link_onsets_files
+  end
+  
+  def setup_conditions
+    @conditions = @conditions ? @conditions.collect! {|c| c.to_sym} : DEFAULT_CONDITIONS 
+  end
+  
+  def create_or_link_onsets_files
+    if @onsetsfiles.nil?
+		  if @logresponsefiles
+		    puts @logresponsefiles
+		    puts @onsetsfiles = create_onsets_files(@logresponsefiles, conditions)
+	    else
+	      raise ScriptError, "Multiple conditions cannot be calculated because both log response files and onsets mat files haven't been defined."
+      end
+    else
+	    link_onsets_files
+		end
+  end
+	  
 	def create_onsets_files(log_response_files, conditions)
 	  onsets_mat_files = []
 	  log_response_files.each do |logfile|
-	    prefix = File.basename(logfile, '.txt')
+	    # Either Strip off the prefix directly without changing the name...
+      #   prefix = File.basename(logfile, '.txt')
+      # Or create a new name based on standard logfile naming scheme:
+      # mrt00015_xxx_021110_faces3_recognitionA.txt
+      prefix = File.basename(logfile, '.txt').split("_").values_at(0,3,4).join("_")
+      puts prefix
 	    log = Logfile.new(logfile, *conditions)
+	    puts log.to_csv
 	    log.write_csv(prefix + '.csv')
 	    onsets_mat_files << log.write_mat(prefix)
     end
@@ -43,9 +64,8 @@ module Merit220Stats
     
     queue = MatlabQueue.new
 	  queue.paths << ['/Applications/spm/spm8/spm8_current', 
-      File.expand_path(File.dirname(__FILE__)), 
-      File.expand_path(File.join(File.dirname(__FILE__), '..', 'matlab_helpers'))
-    ]
+      File.join(@root_dir, 'custom_methods'), 
+      File.join(@root_dir, 'matlab_helpers')    ]
 
 	  queue << "Merit220Stats('#{@statsdir}/', \
     { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \

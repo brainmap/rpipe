@@ -24,8 +24,8 @@ module Merit220Preproc
 	  raise ScriptError, "Can't find any slice-time corrected images in #{@origdir}" if images.empty?
 	  queue = MatlabQueue.new
 	  queue.paths << ['/Applications/spm/spm8/spm8_current', 
-      File.expand_path(File.dirname(__FILE__)), 
-      File.expand_path(File.join(File.dirname(__FILE__), '..', 'matlab_helpers'))
+      File.join(@root_dir, 'custom_methods'), 
+      File.join(@root_dir, 'matlab_helpers')
     ]
 
 	  queue << "Merit220Preproc('#{@procdir}/', \

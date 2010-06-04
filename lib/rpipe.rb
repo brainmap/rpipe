@@ -2,6 +2,8 @@ require 'rubygems'
 require 'yaml'
 require 'ftools'
 require 'fileutils'
+require 'pathname'
+require 'metamri/core_additions'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'custom_methods'))
@@ -13,7 +15,7 @@ class JobStep
 	
 	COLLISION_POLICY = :panic # options -- :panic, :destroy, :overwrite
 	
-	attr_accessor :subid, :rawdir, :origdir, :procdir, :statsdir, :spmdir, :collision_policy
+	attr_accessor :subid, :rawdir, :origdir, :procdir, :statsdir, :spmdir, :collision_policy, :root_dir
 	
 	# Intialize with two configuration option hashes - workflow_spec and job_spec
 	def initialize(workflow_spec, job_spec)
@@ -26,6 +28,7 @@ class JobStep
 		@spmdir   = job_spec['spmdir']    || workflow_spec['spmdir']
 		@collision_policy = (job_spec['collision'] || workflow_spec['collision'] || COLLISION_POLICY).to_sym
 		include_custom_methods(job_spec['method'])
+		@root_dir = File.dirname(Pathname.new(__FILE__).realpath)
 	end
 	
 	# Dynamically load custom methods for advanced processing.
@@ -158,12 +161,15 @@ class RPipe
 	
 	attr_accessor :recon_jobs, :preproc_jobs, :stats_jobs, :workflow_spec
 	
+	ROOT_DIR = File.expand_path(File.dirname(__FILE__))
+	
 	# To initialize an instance create a yaml configuration file and pass the filename to the constructor
 	# Yaml drivers contain a list of entries, each of which contains all the information necessary to create an instance
 	# the proper object that executes the job.	Details on the formatting of the yaml drivers including examples will be
 	# provided in other documentation.
 	# Raises an error if the file is not found in the file system.
 	def initialize(driver_file)
+		
 		@recon_jobs = []
 		@preproc_jobs = []
 		@stats_jobs = []
@@ -182,6 +188,7 @@ class RPipe
 		def jobs
 		  [@recon_jobs, @preproc_jobs, @stats_jobs].flatten
 	  end
+	  
 	end
 	
 end

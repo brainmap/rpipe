@@ -1,6 +1,7 @@
 require 'helper_spec'
 require 'logfile'
 require 'pp'
+require 'yaml'
 
 describe "Test Logfile Helper" do
 	before(:all) do
@@ -14,6 +15,8 @@ describe "Test Logfile Helper" do
 	  
 	  @equal_length_conditions = [:new, :old]
 	  @unequal_length_conditions = [:new_correct, :new_incorrect, :old_correct, :old_incorrect]
+	  
+	  @ruport_summary = YAML.load_file(File.join(File.dirname(__FILE__), 'fixtures', 'ruport_summary.yml'))
   end
 	  
   it "should take a text file with vectors of equal length and convert it to a condition csv" do 
@@ -52,6 +55,13 @@ describe "Test Logfile Helper" do
   
   it "should raise an error if the logfile can't be found" do
     lambda { Logfile.new('bad_path_to_logfile.csv')}.should raise_error(IOError) 
+  end
+  
+  it "should summarize a directory of logfiles" do
+    summary = Logfile.summarize_directory(File.join(File.dirname(__FILE__), 'fixtures'))
+    summary.column_names.should == ["enum", "task", "version", "ctime", "Total Count", " Hits", " Misses", " Hit%", " Correct", " Incorrect", " Accuracy%", " RT min", " RT max", " RT avg", " RT stdev", " old_stimuli", " old_hits", " old_misses", " old_hit_percent", " old_correct_count", " old_incorrect_count", " old_accuracy", " old_rt_min", " old_rt_max", " old_rt_avg", " old_rt_stdev", " old_correct", " old_correct_rt_min", " old_correct_rt_max", " old_correct_rt_avg", " old_correct_rt_stdev", " old_incorrect", " old_incorrect_rt_min", " old_incorrect_rt_max", " old_incorrect_rt_avg", " old_incorrect_rt_stdev", " new_stimuli", " new_hits", " new_misses", " new_hit_percent", " new_correct_count", " new_incorrect_count", " new_accuracy", " new_rt_min", " new_rt_max", " new_rt_avg", " new_rt_stdev", " new_correct", " new_correct_rt_min", " new_correct_rt_max", " new_correct_rt_avg", " new_correct_rt_stdev", " new_incorrect", " new_incorrect_rt_min", " new_incorrect_rt_max", " new_incorrect_rt_avg", " new_incorrect_rt_stdev", " "]
+    summary.length.should == 1
+    summary.should == @ruport_summary
   end
     
   after(:each) do

@@ -1,5 +1,5 @@
 require 'matlab_queue'
-require 'pp'
+require 'ruport'
 
 ###############################################	 START OF CLASS	 ######################################################
 # An object that helps parse and format Behavioral Logfiles.
@@ -14,8 +14,10 @@ class Logfile
     @conditions = conditions
     raise IOError, "Can't find file #{path}" unless File.exist?(path)
     File.open(path, 'r').each do |line| 
-      @textfile_data << line.split(/[\,\:\s]+/).each { |val| val.strip } 
+      @textfile_data << line.split(/[\,\:\n\r]+/).each { |val| val.strip } 
     end
+    
+    raise IOError, "Problem reading #{@textfile} - no data found." if @textfile_data.empty?
 
   end
   
@@ -42,8 +44,8 @@ class Logfile
   def write_mat(prefix)
     queue = MatlabQueue.new
     queue.paths << [
-      File.expand_path(File.dirname(__FILE__)), 
-      File.expand_path(File.join(File.dirname(__FILE__), '..', 'matlab_helpers'))
+      RPipe::ROOT_DIR, 
+      File.join(RPipe::ROOT_DIR, 'matlab_helpers')
     ]
 
     queue << "prepare_onsets_xls( \
@@ -61,13 +63,49 @@ class Logfile
     File.stat(@textfile).mtime <=> File.stat(other_logfile.textfile).mtime
   end
   
+  def self.write_summary(filename = 'tmp.csv', directory = Dir.pwd, grouping = 'version')
+    table = self.summarize_directory(directory)
+    File.open(filename, 'w') do |f| 
+      f.puts Ruport::Data::Grouping(table, :by => grouping).to_csv
+    end
+  end
+    
+  def self.summarize_directory(directory)
+    table = Ruport::Data::Table.new
+    Dir.glob(File.join(directory, '*.txt')).each do |logfile| 
+      lf = Logfile.new(logfile)      
+      table << lf.ruport_summary
+      table.column_names = lf.summary_attributes if table.column_names.empty?
+    end
+    return table
+  end
+  
+  def ruport_summary
+    Ruport::Data::Record.new(summary_data, :attributes => summary_attributes )
+  end
+  
+  def summary_data
+    enum, task, version = File.basename(@textfile).split("_").values_at(0,3,4)
+    enum = File.basename(enum) unless enum.nil?
+    version = File.basename(version, '.txt') unless version.nil?
+    ctime = File.stat(@textfile).ctime
+    
+    [[enum, task, version, ctime], @textfile_data[1]].flatten
+  end
+  
+  def summary_attributes
+    ['enum', 'task', 'version', 'ctime'] + @textfile_data[0]
+  end
+  
   private
   
   def extract_condition_vectors(conditions)
-    pp conditions
     vectors = {}
+    @conditions
     @textfile_data.each do |line|
       next if line.empty?
+      # Headers are written in the Textfile as "New(Correct)".
+      # Convert them to proper condition names - downcase sepearted by underscores
       header = line.first.gsub(/(\(|\))/, '_').downcase.chomp("_").to_sym
       if conditions.include?(header);
         # Make sure this isn't a column line inside the logfile.
@@ -76,6 +114,8 @@ class Logfile
         end
       end
     end
+    
+    raise ScriptError, "Unable to read vectors for #{@textfile}" if vectors.empty?
     
     return vectors
   end

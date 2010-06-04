@@ -12,9 +12,9 @@ describe "Unit testing for johnson.merit220.visit1" do
     conditions = [:new_correct, :new_incorrect, :old_correct, :old_incorrect]
     @job.onsetsfiles = @job.create_onsets_files(@job.logresponsefiles, conditions)
     @job.onsetsfiles.should_not be_nil
-    # @job.onsetsfiles.should == ["/Data/scratch/mrt00015/onsets/mrt00015_faces3_recognitionA.mat", "/Data/scratch/mrt00015/onsets/mrt00015_faces3_recognitionB.mat"]
-    @job.onsetsfiles.each do |job|
-      File.exist?(job).should be_true
+    @job.onsetsfiles.should == ["mrt00015_faces3_recognitionB.mat", "mrt00015_faces3_recognitionA.mat"]
+    @job.onsetsfiles.each do |onsetfile|
+      File.exist?(onsetfile).should be_true
     end
   end
   
