@@ -20,7 +20,7 @@ module Merit220Preproc
 	private
 	
 	def run_preproc_mfile
-	  images = Dir.glob(File.join(@origdir, "a#{@subid}*.nii"))
+	  images = Dir.glob(File.join(@origdir, "a*#{@subid}*.nii"))
 	  raise ScriptError, "Can't find any slice-time corrected images in #{@origdir}" if images.empty?
 	  queue = MatlabQueue.new
 	  queue.paths << ['/Applications/spm/spm8/spm8_current', 

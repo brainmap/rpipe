@@ -21,7 +21,7 @@ module DefaultPreproc
 	# where subid is the subject id specified in the preproc_spec hash.
 	def link_files_into_proc
 		flash "Linking files from #{@origdir} into #{@procdir}"
-		wildcard = File.join(@origdir,"a#{@subid}*.nii")
+		wildcard = File.join(@origdir,"a*#{@subid}*.nii")
 		system("ln -s #{wildcard} #{@procdir}")
 	end
 	

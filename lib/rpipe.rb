@@ -90,6 +90,7 @@ class Reconstruction < JobStep
 	def initialize(workflow_spec, recon_spec)
 		super(workflow_spec, recon_spec)
 		@scans = recon_spec['scans']
+		raise ScriptError, "At least one scan must be specified." if @scans.nil?
 		@volume_skip = recon_spec['volume_skip'] || VOLUME_SKIP
 	end
 

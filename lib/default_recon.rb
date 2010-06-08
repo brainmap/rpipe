@@ -1,3 +1,10 @@
+$LOAD_PATH.unshift('/Data/home/erik/code/physionoise/lib')
+
+require 'metamri/core_additions'
+require 'physiospec'
+
+require 'pathname'
+
 module DefaultRecon
 	
 	# Reconstructs, strips, and slice timing corrects all scans specified in the recon_spec.
@@ -7,14 +14,19 @@ module DefaultRecon
 		
 		setup_directory(@origdir, "RECON")
 		
-		Dir.chdir(@origdir) do
-			@scans.each do |scan_spec|
+		Dir.chdir(@origdir) do		  
+			@scans.each_with_index do |scan_spec, i|
 				outfile = "%s_%s.nii" % [@subid, scan_spec['label']]
 				
 				reconstruct_scan(scan_spec, 'tmp.nii')
 				
 				if scan_spec['type'] == "func"
 					strip_leading_volumes('tmp.nii', outfile, @volume_skip, scan_spec['bold_reps'])
+					if scan_spec['physio_files']
+            create_physiosnoise_regressors(scan_spec)
+            outfile = run_retroicor(scan_spec['physio_files'], outfile)
+				  end
+				  
 					slice_time_correct(outfile)
 				else
 					File.copy('tmp.nii', outfile)
@@ -33,20 +45,25 @@ module DefaultRecon
 	def reconstruct_scan(scan_spec, outfile)
 		scandir = File.join(@rawdir, scan_spec['dir'])
 		
-		# second_file = File.join(scandir, 'I0002.dcm')
-		# wildcard = File.join(scandir,'I*dcm')
+		Pathname.new(scandir).all_dicoms do |dicoms|
 		
-		second_file = Dir.glob( File.join(scandir, "*0002*") )
-		wildcard = File.join(scandir, "*.[0-9]*")
+  		# second_file = File.join(scandir, 'I0002.dcm')
+  		# wildcard = File.join(scandir,'I*dcm')
+  		
+  		local_scandir = File.dirname(dicoms.first)
 		
-		recon_cmd_format = 'to3d -skip_outliers %s -prefix tmp.nii "%s"'
+  		second_file = Dir.glob( File.join(local_scandir, "*0002*") )
+  		wildcard = File.join(local_scandir, "*.[0-9]*")
+		
+  		recon_cmd_format = 'to3d -skip_outliers %s -prefix tmp.nii "%s"'
 
-		timing_opts = timing_options(scan_spec, second_file)
+  		timing_opts = timing_options(scan_spec, second_file)
 		
-		flash "Reconstruction: #{scandir}"
+  		flash "Reconstruction: #{scandir}"
 		
-		unless system(recon_cmd_format % [timing_opts, wildcard])
-			raise(IOError,"Failed to reconstruct scan: #{scandir}")
+  		unless system(recon_cmd_format % [timing_opts, wildcard])
+  			raise(IOError,"Failed to reconstruct scan: #{scandir}")
+  		end
 		end
 	end
 	
@@ -75,5 +92,56 @@ module DefaultRecon
 		flash "Slice Timing Correction: #{infile}"
 		system("3dTshift -tzero 0 -tpattern alt+z -prefix a#{infile} #{infile}")
 	end
+	
+	def generate_physiospec
+	  physiospec = Physiospec.new(@rawdir, File.join(@rawdir, '..', 'cardiac'))
+	  physiospec.epis_and_associated_phys_files
+  end
+	
+	def create_physiosnoise_regressors(scan_spec)
+    run = scan_spec['physio_files'].dup
+    flash "Physionoise Regressors: #{run[:phys_directory]}"
+    run[:bold_reps] = scan_spec['bold_reps']
+    run[:rep_time] = scan_spec['rep_time']
+    unless Pathname.new(run[:phys_directory]).absolute?
+      run[:phys_directory] = File.join(@rawdir, run[:phys_directory])
+    end
+    run[:run_directory] = @rawdir
+    runs = [run]
+
+    Physiospec.run_physionoise_on(runs, ["--saveFiles"])
+  end
+	
+	# Runs 3dRetroicor for a scan.
+	# Returns the output filename if successful or raises an error if there was an error.
+	def run_retroicor(physio_files, file)
+	  icor_cmd, outfile = build_retroicor_cmd(physio_files, file)
+	  flash "3dRetroicor: #{file} \n #{icor_cmd}"
+	  if system(icor_cmd)
+	    return outfile
+    else
+      raise ScriptError, "Problem running #{icor_cmd}"
+    end
+  end
+	
+	def build_retroicor_cmd(physio_files, file)
+    prefix = 'p'
+    unless Pathname.new(physio_files[:cardiac_signal]).absolute?
+      cardiac_signal = File.join(@rawdir, physio_files[:phys_directory], physio_files[:cardiac_signal])
+    end
+    
+    unless Pathname.new(physio_files[:respiration_signal]).absolute?
+      respiration_signal = File.join(@rawdir, physio_files[:phys_directory], physio_files[:respiration_signal])
+    end
+    
+    outfile = prefix + file
+
+    icor_format = "3dretroicor -prefix %s -card %s -resp %s %s"
+    icor_options = [outfile, cardiac_signal, respiration_signal, file]
+    icor_cmd = icor_format % icor_options
+    return icor_cmd, outfile
+  end
+  
+
 	
 end

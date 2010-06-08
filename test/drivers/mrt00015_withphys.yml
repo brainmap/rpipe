@@ -1,8 +1,8 @@
 subid: mrt00015
 rawdir: /Data/scratch/mrt00015/dicoms
-origdir: /Data/scratch/mrt00015_orig
-procdir: /Data/scratch/mrt00015_proc
-statsdir: /Data/scratch/mrt00015_stats
+origdir: /Data/scratch/mrt00015_withphys_orig
+procdir: /Data/scratch/mrt00015_withphys_proc
+statsdir: /Data/scratch/mrt00015_withphys_stats
 collision: destroy
 
 jobs:
@@ -14,17 +14,41 @@ jobs:
         task: Faces3A
         bold_reps: 167
         z_slices: 36
+        rep_time: 2.0
+        physio_files:
+            :respiration_signal: RESPData_epiRT_0211201009_21_22_80
+            :phys_directory: ../cardiac # Relative to raw dir or absolute
+            :respiration_trigger: RESPTrig_epiRT_0211201009_21_22_80
+            :cardiac_signal: PPGData_epiRT_0211201009_21_22_80
+            :series_description: EPI  fMRI Task1
+            :cardiac_trigger: PPGTrig_epiRT_0211201009_21_22_80
       - dir: s08_epi
         type: func
         label: task2
         task: Faces3B
         bold_reps: 167
         z_slices: 36
+        rep_time: 2.0
+        physio_files:
+            :respiration_signal: RESPData_epiRT_0211201009_28_12_835
+            :phys_directory: ../cardiac # Relative to raw dir or absolute
+            :respiration_trigger: RESPTrig_epiRT_0211201009_28_12_835
+            :cardiac_signal: PPGData_epiRT_0211201009_28_12_835
+            :series_description: EPI  fMRI Task2
+            :cardiac_trigger: PPGTrig_epiRT_0211201009_28_12_835
       - dir: s09_epi
         type: func
         label: rest
         bold_reps: 167
         z_slices: 36
+        rep_time: 2.0
+        physio_files:
+            :respiration_signal: RESPData_epiRT_0211201009_34_39_738
+            :phys_directory: ../cardiac # Relative to raw dir or absolute
+            :respiration_trigger: RESPTrig_epiRT_0211201009_34_39_738
+            :cardiac_signal: PPGData_epiRT_0211201009_34_39_738
+            :series_description: EPI  Resting fMRI
+            :cardiac_trigger: PPGTrig_epiRT_0211201009_34_39_738
         
   - step: preprocess
     method: Merit220Preproc

@@ -7,26 +7,49 @@ collision: destroy
 
 jobs:
   - step: reconstruct
-    correct_for_physionoise: true
     scans:
       - dir: s06_epi
         type: func
         label: task1
         task: Faces3B
         bold_reps: 167
+        rep_time: 2.0
         z_slices: 36
+        physio_files:
+          :respiration_signal: RESPData_epiRT_0104201014_30_10_548
+          :phys_directory: ../cardiac # Relative to raw dir or absolute
+          :respiration_trigger: RESPTrig_epiRT_0104201011_52_42_681
+          :cardiac_signal: PPGData_epiRT_0104201012_05_52_833
+          :series_description: EPI  fMRI Task1
+          :cardiac_trigger: PPGTrig_epiRT_0104201014_17_33_910
       - dir: s07_epi
         type: func
         label: task2
         task: Faces3A
         bold_reps: 167
         z_slices: 36
+        rep_time: 2.0
+        physio_files:
+          :respiration_signal: RESPData_epiRT_0104201014_36_30_188
+          :phys_directory: ../cardiac
+          :respiration_trigger: RESPTrig_epiRT_0104201011_59_09_488
+          :cardiac_signal: PPGData_epiRT_0104201014_11_22_649
+          :series_description: EPI  fMRI Task2
+          :cardiac_trigger: PPGTrig_epiRT_0104201014_23_46_498
       - dir: s08_epi
         type: func
         label: rest
         bold_reps: 167
         z_slices: 36
-        
+        rep_time: 2.0
+        physio_files:
+          :respiration_signal: RESPData_epiRT_0104201014_42_45_68
+          :phys_directory: ../cardiac
+          :respiration_trigger: RESPTrig_epiRT_0104201012_05_52_833
+          :cardiac_signal: PPGData_epiRT_0104201014_42_45_68
+          :series_description: EPI  Resting fMRI
+          :cardiac_trigger: PPGTrig_epiRT_0104201014_30_10_548
+            
   - step: preprocess
     method: Merit220Preproc
     bold_reps:
@@ -37,8 +60,8 @@ jobs:
   - step: stats
     method: Merit220Stats
     logresponsefiles:
-      - /Volumes/MED-CLUSTER-B.MEDICINE_DATA/team/FMRI/BEHAVIORAL_ANALYSES/CURRENT/johnson.merit220.visit1/Scan/Unprocessed/mrt00001_tts_010410_faces3_recognitionB.txt
-      - /Volumes/MED-CLUSTER-B.MEDICINE_DATA/team/FMRI/BEHAVIORAL_ANALYSES/CURRENT/johnson.merit220.visit1/Scan/Unprocessed/mrt00001_tts_010410_faces3_recognitionA.txt
+      - /Volumes/MED-CLUSTER-A.MEDICINE_DATA/team/FMRI/BEHAVIORAL_ANALYSES/CURRENT/johnson.merit220.visit1/Scan/Unprocessed/mrt00001_tts_010410_faces3_recognitionB.txt
+      - /Volumes/MED-CLUSTER-A.MEDICINE_DATA/team/FMRI/BEHAVIORAL_ANALYSES/CURRENT/johnson.merit220.visit1/Scan/Unprocessed/mrt00001_tts_010410_faces3_recognitionA.txt
       # - /Data/scratch/mrt00015/onsets/mrt00015_sep_021110_faces3_recognitionA.txt
       # - /Data/scratch/mrt00015/onsets/mrt00015_sep_021110_faces3_recognitionB.txt
       # This is an ordered list, so put A or B first as appropriate. 
