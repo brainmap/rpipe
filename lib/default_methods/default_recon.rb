@@ -1,7 +1,7 @@
 $LOAD_PATH.unshift('/Data/home/erik/code/physionoise/lib')
 
 require 'metamri/core_additions'
-require 'physiospec'
+require 'physionoise'
 
 require 'pathname'
 
@@ -109,7 +109,7 @@ module DefaultRecon
     run[:run_directory] = @rawdir
     runs = [run]
 
-    Physiospec.run_physionoise_on(runs, ["--saveFiles"])
+    Physionoise.run_physionoise_on(runs, ["--saveFiles"])
   end
 	
 	# Runs 3dRetroicor for a scan.

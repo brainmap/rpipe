@@ -29,6 +29,8 @@ class JobStep
 		@collision_policy = (job_spec['collision'] || workflow_spec['collision'] || COLLISION_POLICY).to_sym
 		include_custom_methods(job_spec['method'])
 		@root_dir = File.dirname(Pathname.new(__FILE__).realpath)
+		
+		job_requires 'subid'
 	end
 	
 	# Dynamically load custom methods for advanced processing.
@@ -69,6 +71,33 @@ class JobStep
 		end
 	end
 	
+	# Check for required keys in instance variables.
+  def job_requires(*args)
+    check_instance_vars *args do |missing_vars|
+      error = "
+      Warning: Misconfiguration detected.
+      You are missing the following required variables from your spec file:
+      #{missing_vars.collect { |var| "  - #{var} \n" } }
+      "
+      
+      puts error
+      raise ScriptError, "Missing Vars: #{missing_vars.join(", ")}"
+    end
+  end
+  
+  def check_instance_vars(*args)
+    undefined_vars = []
+    args.each do |arg|
+      unless instance_variable_defined?("@" + arg)
+        undefined_vars << arg
+      end
+    end
+    
+    unless undefined_vars.size == 0
+      yield undefined_vars
+    end
+  end
+  	
 end
 
 
@@ -92,6 +121,8 @@ class Reconstruction < JobStep
 		@scans = recon_spec['scans']
 		raise ScriptError, "At least one scan must be specified." if @scans.nil?
 		@volume_skip = recon_spec['volume_skip'] || VOLUME_SKIP
+		
+		job_requires 'rawdir', 'origdir', 'scans'
 	end
 
 end
@@ -119,6 +150,8 @@ class Preprocessing < JobStep
 		@tspec = preproc_spec['template_spec']
 		@motion_threshold = preproc_spec['motion_threshold'] || MOTION_THRESHOLD
 		@bold_reps = preproc_spec['bold_reps']
+		
+		job_requires 'origdir', 'procdir'
 	end
 
 end
@@ -164,21 +197,30 @@ class RPipe
 	
 	ROOT_DIR = File.expand_path(File.dirname(__FILE__))
 	
-	# To initialize an instance create a yaml configuration file and pass the filename to the constructor
-	# Yaml drivers contain a list of entries, each of which contains all the information necessary to create an instance
-	# the proper object that executes the job.	Details on the formatting of the yaml drivers including examples will be
+	# Initialize an RPipe instance by passing it a pipeline configuration driver.
+	# Drivers contain a list of entries, each of which contains all the 
+	# information necessary to create an instance of the proper object that 
+	# executes the job.	Details on the formatting of the yaml drivers including examples will be
 	# provided in other documentation.
-	# Raises an error if the file is not found in the file system.
-	def initialize(driver_file)
+	#
+	# The driver may be either a Hash or a yaml configuration file.
+	
+	def initialize(driver)
 		
 		@recon_jobs = []
 		@preproc_jobs = []
 		@stats_jobs = []
 		
-		raise(IOError, "Driver file not found: #{driver_file}") unless File.exist?(driver_file)
-		@workflow_spec = YAML.load_file(driver_file)
+		# A driver may be either a properly configured hash or a Yaml file containing
+		# the configuration.  
+		if driver.class == Hash
+		  @workflow_spec = driver
+	  else
+	    @workflow_spec = read_driver_file(driver)
+    end
+  		
 		
-		jobs = @workflow_spec['jobs']
+    jobs = @workflow_spec['jobs']
 		
 		jobs.each do |job_params|
 			@recon_jobs   << Reconstruction.new(@workflow_spec, job_params) if job_params['step'] == 'reconstruct'
@@ -191,6 +233,20 @@ class RPipe
 	  end
 	  
 	end
+	
+	private
+	
+	# Read the YAML file and return the Driver Configuration.
+	# Raises an error if the file is not found in the file system.
+	def read_driver_file(driver_file)
+		raise(IOError, "Driver file not found: #{driver_file}") unless File.exist?(driver_file)
+		YAML.load_file(driver_file)	  
+  end
+  
+  # To compare jobs look at their configuration, not ruby object identity.
+  def ==(other_rpipe)
+    @workflow_spec == other_rpipe.workflow_spec
+  end
 	
 end
 ###############################################	 END OF CLASS	 #########################################################
