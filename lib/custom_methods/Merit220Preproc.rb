@@ -1,4 +1,4 @@
-require 'matlab_queue'
+require 'matlab_helpers/matlab_queue'
 module Merit220Preproc
 	
 	# Runs the preprocessing job, including spm job customization, run spm job, and handling motion issues.

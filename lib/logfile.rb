@@ -1,4 +1,4 @@
-require 'matlab_queue'
+require 'matlab_helpers/matlab_queue'
 require 'ruport'
 
 ###############################################	 START OF CLASS	 ######################################################

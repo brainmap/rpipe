@@ -78,7 +78,7 @@ end
 # Uses AFNI to convert from dicoms to 3D or 4D nifti files, initial volume stripping, and slice timing correction.
 # Currently, only dicom raw data is supported, and only supports the I****.dcm file naming convention.
 class Reconstruction < JobStep
-	require 'default_recon'
+	require 'default_methods/default_recon'
 	include DefaultRecon
 	
 	VOLUME_SKIP = 3 # number of volumes to strip from beginning of functional scans.
@@ -106,7 +106,7 @@ end
 # job, running the job, calculating withing scan motion derivatives, and finally checking for excessive motion.
 # The spm job should normally include tasks for realignment, normalization, and smoothing. 
 class Preprocessing < JobStep
-	require 'default_preproc'
+	require 'default_methods/default_preproc'
 	include DefaultPreproc
 
 	MOTION_THRESHOLD = 1 # maximum allowable realignment displacement in any direction
@@ -132,7 +132,7 @@ end
 # A class used to compute the first level stats for a functional MRI visit data set.
 # Currently very incomplete, any ideas for other data/attributes we need here?
 class Stats < JobStep
-	require 'default_stats'
+	require 'default_methods/default_stats'
 	include DefaultStats
 	
 	attr_accessor :statsdir, :tspec, :onsetsfiles, :logresponsefiles, :regressorsfiles, :bold_reps, :conditions
