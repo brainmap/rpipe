@@ -1,17 +1,33 @@
 = rpipe
 
-Description goes here.
+RPipe parses and processes MRI data through nifti file conversion (or reconstruction for Pfiles, not currently supported), preprocessing and basic first-level statistics using SPM.  
 
-== Note on Patches/Pull Requests
- 
-* Fork the project.
-* Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
-* Send me a pull request. Bonus points for topic branches.
+== Note on Usage
+
+Use consists of parsing a directory using job and workflow generators to create a Yaml driver file, and then running that driver through RPipe.
+
+Since not all studies are processed the same way, custom methods can be included in the main processing stream and can override as many methods as necessary to customize the workflow.  Include a 'method' key in the step you wish to customize in the yaml driver file and then put customizations into lib/custom_methods.
+
+Preprocessing and Stats use SPM, which is notoriously painful to use programatically (it's designed mainly as a GUI program).  SPM8 included an easy to way to "harvest" job information, and we have included several Matlab helpers to for default Normalization and Stats jobs.  See the _job.m files in custom methods for more detail.
+
+== Dependencies
+
+Raw MRI information is read from DICOM headers using the metamri parser gem, which in turn depends on RubyDicom (in the future) and dicom_hdr (AFNI).
+
+Button-press response Logfile parsing is done using the Ruport reporting gem as a frontend store.  This is probably more complicated than it needed to be, but should be robust in the future.
+
+All three primary neuroimaging packages, SPM, AFNI, and FSL are required for various steps in the default pipeline. 
+- Reconstruction depends on to3d (AFNI), discdacq removal on fslroi (FSL), slicetiming on 3dTshift (AFNI).
+- Preprocessing depends on SPM
+- Stats depends on SPM
+
+- http://www.fil.ion.ucl.ac.uk/spm/
+- http://afni.nimh.nih.gov/afni
+- http://www.fmrib.ox.ac.uk/fsl
+
+== History
+
+RPipe replaces the WADRC-fMRI-Pipeline, a pipeline previously used for preprocessing that was ported into python from bash.  That thing was a beast!
 
 == Copyright
-
-Copyright (c) 2010 Kristopher Kosmatka. See LICENSE for details.
+Copyright (c) 2010 WADRC Neuroimaging Core. See LICENSE for details.
