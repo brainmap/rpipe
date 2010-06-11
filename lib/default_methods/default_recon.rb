@@ -1,4 +1,4 @@
-$LOAD_PATH.unshift('/Data/home/erik/code/physionoise/lib')
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', '..', '..',  'physionoise/lib')
 
 require 'metamri/core_additions'
 require 'physionoise'
@@ -99,17 +99,20 @@ module DefaultRecon
   end
 	
 	def create_physiosnoise_regressors(scan_spec)
-    run = scan_spec['physio_files'].dup
+    runs = build_physionoise_run_spec(scan_spec)
+    Physionoise.run_physionoise_on(runs, ["--saveFiles"])
+  end
+  
+  def build_physionoise_run_spec(rpipe_scan_spec)
+    run = rpipe_scan_spec['physio_files'].dup
     flash "Physionoise Regressors: #{run[:phys_directory]}"
-    run[:bold_reps] = scan_spec['bold_reps']
-    run[:rep_time] = scan_spec['rep_time']
+    run[:bold_reps] = rpipe_scan_spec['bold_reps']
+    run[:rep_time] = rpipe_scan_spec['rep_time']
     unless Pathname.new(run[:phys_directory]).absolute?
       run[:phys_directory] = File.join(@rawdir, run[:phys_directory])
     end
     run[:run_directory] = @rawdir
     runs = [run]
-
-    Physionoise.run_physionoise_on(runs, ["--saveFiles"])
   end
 	
 	# Runs 3dRetroicor for a scan.

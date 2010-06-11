@@ -10,7 +10,7 @@ module Merit220Stats
 		
 		Dir.chdir(@statsdir) do
 			link_files_from_proc_directory(File.join(@procdir, "sw*.nii"), File.join(@procdir, "rp*.txt"))
-			setup_onsets			
+			setup_onsets
 			run_stats_spm_job
 		end
 	end
@@ -28,35 +28,16 @@ module Merit220Stats
   
   def create_or_link_onsets_files
     if @onsetsfiles.nil?
-		  if @logresponsefiles
-		    puts @logresponsefiles
-		    puts @onsetsfiles = create_onsets_files(@logresponsefiles, conditions)
+		  if @responses.nil?
+		    raise ScriptError, "Multiple conditions cannot be calculated because neither log response files nor onsets mat files have been defined."
 	    else
-	      raise ScriptError, "Multiple conditions cannot be calculated because both log response files and onsets mat files haven't been defined."
+	      puts @onsetsfiles = create_onsets_files(@responses, conditions)
       end
     else
 	    link_onsets_files
 		end
   end
-	  
-	def create_onsets_files(log_response_files, conditions)
-	  onsets_mat_files = []
-	  log_response_files.each do |logfile|
-	    # Either Strip off the prefix directly without changing the name...
-      #   prefix = File.basename(logfile, '.txt')
-      # Or create a new name based on standard logfile naming scheme:
-      # mrt00015_xxx_021110_faces3_recognitionA.txt
-      prefix = File.basename(logfile, '.txt').split("_").values_at(0,3,4).join("_")
-      puts prefix
-	    log = Logfile.new(logfile, *conditions)
-	    puts log.to_csv
-	    log.write_csv(prefix + '.csv')
-	    onsets_mat_files << log.write_mat(prefix)
-    end
-    
-    return onsets_mat_files
-  end
-
+  
   # Finally runs the stats job 
   def run_stats_spm_job
     images = Dir.glob(File.join(@statsdir, "sw*#{@subid}*task*.nii"))

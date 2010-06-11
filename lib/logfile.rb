@@ -43,9 +43,13 @@ class Logfile
   
   def write_mat(prefix)
     queue = MatlabQueue.new
+    # queue.paths << [
+    #   RPipe::ROOT_DIR, 
+    #   File.join(RPipe::ROOT_DIR, 'matlab_helpers')
+    # ]
+    
     queue.paths << [
-      RPipe::ROOT_DIR, 
-      File.join(RPipe::ROOT_DIR, 'matlab_helpers')
+      Pathname.new(File.join(File.dirname(__FILE__), 'matlab_helpers'))
     ]
 
     queue << "prepare_onsets_xls( \

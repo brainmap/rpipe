@@ -1,7 +1,8 @@
-$LOAD_PATH.unshift('/Data/home/erik/code/physionoise/lib/')
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '../../physionoise/lib'))
 
 require 'helper_spec'
-require 'physiospec'
+require 'rpipe'
+require 'physionoise'
 
 
 describe "Test Phyiosnoise" do
@@ -34,6 +35,17 @@ describe "Test Phyiosnoise" do
 	    "statsdir"=>  Dir.mktmpdir('stats_'),
       "collision"=> "destroy"
     }
+    
+    @valid_physionoise_run_spec = [{
+      :run_directory=>"/Data/vtrak1/raw/test/fixtures/rpipe/mrt00015/dicoms/", 
+      :bold_reps=>167, :respiration_signal=>"RESPData_epiRT_0211201009_21_22_80", 
+      :respiration_trigger=>"RESPTrig_epiRT_0211201009_21_22_80", 
+      :cardiac_signal=>"PPGData_epiRT_0211201009_21_22_80", 
+      :cardiac_trigger=>"PPGTrig_epiRT_0211201009_21_22_80", 
+      :phys_directory=> "/Data/vtrak1/raw/test/fixtures/rpipe/mrt00015/dicoms/../cardiac", 
+      :rep_time=>2.0, 
+      :series_description=>"EPI  fMRI Task1"
+    }]
           
 	  @recon_job = Reconstruction.new(workflow_spec, job_params)
     @scan_spec = @recon_job.scans.first
@@ -49,6 +61,16 @@ describe "Test Phyiosnoise" do
       
     Dir.compare_directories(@recon_job.origdir, @physionoise_fixture_dir).should be_true    
 
+  end
+  
+  it "should correctly build a spec for passing to physionoise" do
+    @recon_job.build_physionoise_run_spec(@scan_spec).should == @valid_physionoise_run_spec
+  end
+  
+  it "should correctly build a physionoise python command" do
+      @valid_physionoise_run_spec.each do |run|
+        puts Physionoise.build_run_cmd(run)
+      end
   end
   
   it "should build a 3dRetroicor string" do
