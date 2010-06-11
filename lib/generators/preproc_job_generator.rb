@@ -2,27 +2,29 @@ require 'generators/job_generator'
 
 ########################################################################################################################
 # A class for parsing a data directory and creating a default Preprocessing Job
+# Intialize a PreprocJobGenerator with a config hash including the following optional keys:
+#
+# - scans : A hash of scans upon which to base preprocessing. 
+#           Used to extract the correct bold reps for SPM.
+#           See #ReconJobGenerator for options for the scans hash.
+# 
+
 class PreprocJobGenerator < JobGenerator
-  def initialize(recon_spec, config = {})
-    @spec = Hash.new
+  def initialize(config = {})
+    config_defaults = {}
+    super config_defaults.merge(config)
+    
     @spec['step'] = 'preprocess'
     
-    @recon_spec = recon_spec
-    
-    config_defaults = {}
-    config_defaults['volumes_to_skip'] = 3
-    @config = config_defaults.merge(config)
-    
-    @spec['method'] = @config['method'] if @config['method']
+    config_requires 'scans'
   end
   
   # Build a job spec and return it.
   def build
     bold_reps = []
-    @recon_spec['scans'].each do |scan|
-      bold_reps << scan['bold_reps'] - @config['volumes_to_skip']
+    @spec['bold_reps'] = @config['scans'].collect do |scan| 
+      scan['bold_reps'] - scan['volumes_to_skip']
     end
-    @spec['bold_reps'] = bold_reps
     
     return @spec
   end

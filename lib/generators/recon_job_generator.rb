@@ -3,17 +3,26 @@ require 'generators/job_generator'
 
 ########################################################################################################################
 # A class for parsing a data directory and creating a default Reconstruction Job
+# Intialize the ReconJobGenerator with the following options in a config hash.
+# 
+# Required Options:
+# - rawdir : The directory containing EPI runs
+#
+# Raises an IOError if the Raw Directory cannot be read, and a 
+# DriverConfigError if the Raw Directory is not specified.
+
 class ReconJobGenerator < JobGenerator
   def initialize(config)
-    @spec = Hash.new
-    @spec['step'] = 'reconstruct'
-    
+    # Add job-specific config defaults to config and initialize teh JobGenerator with them.
     config_defaults = {}
     config_defaults['epi_pattern'] = /fMRI/i
-    @config = config_defaults.merge(config)
-    
-    @rawdir = config['rawdir']
-    
+    config_defaults['volumes_to_skip'] = 3
+    super config_defaults.merge(config)
+
+    @spec['step'] = 'reconstruct'
+
+    config_requires 'rawdir'
+    @rawdir = @config['rawdir']
     raise IOError, "Can't find raw directory #{@rawdir}" unless File.readable?(@rawdir)
   end
   
@@ -41,15 +50,23 @@ class ReconJobGenerator < JobGenerator
     raw_image_file    = dataset.raw_image_files.first
     # phys = Physionoise.new(@rawdir, File.join(@rawdir, '..', 'cardiac' ))
     
-    scan['dir']       = dataset.relative_dataset_path
-    scan['type']      = 'func'
-    scan['z_slices']  = raw_image_file.num_slices
-    scan['bold_reps'] = raw_image_file.bold_reps
-    scan['rep_time']  = raw_image_file.rep_time
-    scan['label']     = dataset.series_description.escape_filename
-    scan['task']      = '?'
-    scan['physio_files']  = "#TODO"
+    scan['dir']             = dataset.relative_dataset_path
+    scan['type']            = 'func'
+    scan['z_slices']        = raw_image_file.num_slices
+    scan['bold_reps']       = raw_image_file.bold_reps
+    scan['volumes_to_skip'] = @config['volumes_to_skip']
+    scan['rep_time']        = raw_image_file.rep_time.in_seconds
+    scan['label']           = dataset.series_description.escape_filename
+    scan['task']            = '?'
+    scan['physio_files']    = "#TODO"
     
     return scan
+  end
+end
+
+# Convert Milliseconds to Seconds for TRs
+class Float
+  def in_seconds
+    self / 1000.0
   end
 end

@@ -1,0 +1,35 @@
+--- 
+- label: EPI-fMRI-Task1
+  dir: s07_epi
+  type: func
+  z_slices: 36
+  rep_time: 2.0
+  bold_reps: 167
+  volumes_to_skip: 3
+  task: "?"
+  physio_files: "#TODO"
+  # physio_files: 
+  #   phys_directory: "../cardiac"
+  #   series_description: "EPI  fMRI Task1"
+  #   respiration_signal: "RESPData_epiRT_0211201009_21_22_80"
+  #   respiration_trigger:"RESPTrig_epiRT_0211201009_21_22_80"
+  #   cardiac_signal:     "PPGData_epiRT_0211201009_21_22_80"
+  #   cardiac_trigger:    "PPGTrig_epiRT_0211201009_21_22_80"  
+- label: EPI-fMRI-Task2
+  dir: s08_epi
+  type: func
+  z_slices: 36
+  rep_time: 2.0
+  bold_reps: 167
+  volumes_to_skip: 3
+  task: "?"
+  physio_files: "#TODO"
+- label: EPI-Resting-fMRI
+  dir: s09_epi
+  type: func
+  z_slices: 36
+  rep_time: 2.0
+  bold_reps: 167
+  volumes_to_skip: 3
+  task: "?"
+  physio_files: "#TODO"

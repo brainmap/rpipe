@@ -13,17 +13,20 @@ jobs:
         label: task1
         task: Faces3A
         bold_reps: 167
+        volumes_to_skip: 3
         z_slices: 36
       - dir: s08_epi
         type: func
         label: task2
         task: Faces3B
         bold_reps: 167
+        volumes_to_skip: 3
         z_slices: 36
       - dir: s09_epi
         type: func
         label: rest
         bold_reps: 167
+        volumes_to_skip: 3
         z_slices: 36
         
   - step: preprocess
@@ -35,9 +38,11 @@ jobs:
       
   - step: stats
     method: Merit220Stats
-    logresponsefiles:
-      - /Volumes/MED-CLUSTER-A.MEDICINE_DATA/team/FMRI/BEHAVIORAL_ANALYSES/CURRENT/johnson.merit220.visit1/Scan/Unprocessed/mrt00015_sep_021110_faces3_recognitionB.txt
-      - /Volumes/MED-CLUSTER-A.MEDICINE_DATA/team/FMRI/BEHAVIORAL_ANALYSES/CURRENT/johnson.merit220.visit1/Scan/Unprocessed/mrt00015_sep_021110_faces3_recognitionA.txt
+    responses:
+      directory: /Volumes/MED-CLUSTER-A.MEDICINE_DATA/team/FMRI/BEHAVIORAL_ANALYSES/CURRENT/johnson.merit220.visit1/Scan/Unprocessed/
+      logfiles: 
+        - mrt00015_sep_021110_faces3_recognitionB.txt
+        - mrt00015_sep_021110_faces3_recognitionA.txt
       # - /Data/scratch/mrt00015/onsets/mrt00015_sep_021110_faces3_recognitionA.txt
       # - /Data/scratch/mrt00015/onsets/mrt00015_sep_021110_faces3_recognitionB.txt
       # This is an ordered list, so put A or B first as appropriate. 
