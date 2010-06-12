@@ -11,20 +11,22 @@ require 'generators/stats_job_generator'
 # and with the following optional keys in a config hash:
 #
 # Directory Options:
-#  - processing_dir : A directory common to  orig, proc and stats directories.
+#  - processing_dir : A directory common to  orig, proc and stats directories, if they are not explicitly specified..
 #  - origdir : A directory where dicoms will be converted to niftis and basic preprocessing occurs.
 #  - procdir : A directory for detailed preprocessing (normalization and smoothing)
 #  - statsdir : A directory where stats will be saved.  (This should be a final directory.)
 
-class WorkflowGenerator
+class WorkflowGenerator < JobGenerator
   attr_reader :spec
   
   def initialize(rawdir, config = Hash.new)
-    @spec = {}
-    @rawdir = rawdir
     config_defaults = {}
     config_defaults['processing_dir'] = Dir.mktmpdir
-    @config = config_defaults.merge(config)
+    super config_defaults.merge(config)
+
+    @rawdir = rawdir
+    
+    config_requires 'responses_dir'
   end
   
   def build
@@ -44,6 +46,7 @@ class WorkflowGenerator
     jobs << StatsJobGenerator.new({
       'scans' => jobs.first['scans'],
       'conditions' => ['new_correct', 'new_incorrect', 'old_correct', 'old_incorrect'],
+      'responses_dir' => @config['responses_dir'],
       'subid' => @spec['subid']
     }).build
     
@@ -53,9 +56,9 @@ class WorkflowGenerator
   end
   
   def parse_subid
-    subject_basename = File.basename(@rawdir) == 'dicoms' ? 
-      File.basename(Pathname.new(File.join(@rawdir, '..')).realpath) : File.basename(@rawdir)
+    subject_path = File.basename(@rawdir) == 'dicoms' ? 
+      Pathname.new(File.join(@rawdir, '..')).realpath : Pathname.new(@rawdir).realpath
       
-    subject_basename.split('_').first
+    subject_path.basename.to_s.split('_').first
   end
 end

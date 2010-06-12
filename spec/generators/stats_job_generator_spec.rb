@@ -3,23 +3,24 @@ require 'generators/stats_job_generator'
 
 describe "StatsJobGenerator creates a Stats Job Driver Spec" do
 	before(:all) do
-    @subid = 'mrt00015'
+    @subid = 'mrt00000'
     @scans = YAML.load_file(File.join(File.dirname(__FILE__), '..', 'fixtures', 'valid_scans.yaml'))
     rootdir = Pathname.new(File.join(File.dirname(__FILE__), '..', '..')).realpath.to_s
     @valid_stats_job_spec = {
       "step"=>"stats",
       "responses"=> {
-        "logfiles" => ["mrt00015_faces3_recognitionB.txt", "mrt00015_faces3_recognitionA.txt"],
-        "directory"=> Pathname.new(File.join(rootdir, 'test', 'fixtures', 'rawdata', 'responses')).cleanpath.to_s
+        "logfiles" => ["mrt00000_abc_01012010_faces3_recognitionB.txt", "mrt00000_abc_01012010_faces3_recognitionA.txt"],
+        "directory"=> File.join($MRI_DATA, 'responses')
       },
       "conditions"=> ["new_correct", "new_incorrect", "old_correct", "old_incorrect"],
-      "regressorsfiles"=> ["rp_amrt00015_EPI-fMRI-Task1.txt", "rp_amrt00015_EPI-fMRI-Task2.txt"],
+      "regressorsfiles"=> ["rp_amrt00000_EPI-fMRI-Task1.txt", "rp_amrt00000_EPI-fMRI-Task2.txt"],
       "bold_reps"=>[164, 164]
     }
     
     @valid_options = {
       'conditions' => ['new_correct', 'new_incorrect', 'old_correct', 'old_incorrect'],
       'subid' => @subid,
+      'responses_dir' => File.join($MRI_DATA, 'responses'),
       'scans' => @scans
     }
   end

@@ -11,6 +11,7 @@ require 'fileutils'
 require 'yaml'
 require 'pp'
 
+$MRI_DATA = ENV['MRI_DATA'] || '/Data/vtrak1/raw/test/fixtures/rpipe'
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $LOAD_PATH.unshift(File.expand_path(File.dirname(__FILE__)))

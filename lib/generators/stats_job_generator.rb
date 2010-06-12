@@ -18,7 +18,7 @@ class StatsJobGenerator < JobGenerator
     
     @spec['step'] = 'stats'
 
-    config_requires 'scans', 'subid', 'conditions'
+    config_requires 'scans', 'subid', 'conditions', 'responses_dir'
     
     @scans = []
     @config['scans'].each { |scan| @scans << scan if scan['label'] =~ @config['epi_task_pattern'] }
@@ -43,7 +43,7 @@ class StatsJobGenerator < JobGenerator
   def responses
     return @responses if @responses
     @responses = {}
-    @responses['directory'] = Pathname.new(File.join(File.dirname(__FILE__), '..', '..', 'test', 'fixtures', 'rawdata', 'responses')).cleanpath.to_s
+    @responses['directory'] = @config['responses_dir']
     @responses['logfiles'] = logfiles
 
     return @responses

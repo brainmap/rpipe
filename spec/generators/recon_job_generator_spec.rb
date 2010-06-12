@@ -3,7 +3,7 @@ require 'generators/recon_job_generator'
 
 describe "Recon Job Generator creates a Recon Job Driver Spec" do
 	before(:all) do
-    @rawdir = File.join(File.dirname(__FILE__), '..', 'fixtures', 'rawdata', 'mrt00015', 'dicoms')
+    @rawdir = File.join($MRI_DATA, 'mrt00000', 'dicoms')
     @scans = YAML.load_file(File.join(File.dirname(__FILE__), '..', 'fixtures', 'valid_scans.yaml'))
     
     @valid_recon_job_spec = {
