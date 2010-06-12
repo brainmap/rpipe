@@ -7,6 +7,7 @@ require 'physionoise'
 
 describe "Test Phyiosnoise" do
 	before(:each) do
+	  @runs_dir = File.join($MRI_DATA, 'mrt00000', 'dicoms')
 	  job_params = {
 	    "scans" => [{
   	    "label"=>"task1",
@@ -28,8 +29,8 @@ describe "Test Phyiosnoise" do
 	  }
 	  
 	  workflow_spec = {
-      "subid"=>"mrt00001",
-      "rawdir"=>"/Data/vtrak1/raw/test/fixtures/rpipe/mrt00015/dicoms/",
+      "subid"=>"mrt00000",
+      "rawdir"=>    @runs_dir,
       "origdir"=>   Dir.mktmpdir('orig_'),
 	    "procdir"=>   Dir.mktmpdir('proc_'),
 	    "statsdir"=>  Dir.mktmpdir('stats_'),
@@ -37,12 +38,12 @@ describe "Test Phyiosnoise" do
     }
     
     @valid_physionoise_run_spec = [{
-      :run_directory=>"/Data/vtrak1/raw/test/fixtures/rpipe/mrt00015/dicoms/", 
+      :run_directory=> @runs_dir, 
       :bold_reps=>167, :respiration_signal=>"RESPData_epiRT_0211201009_21_22_80", 
       :respiration_trigger=>"RESPTrig_epiRT_0211201009_21_22_80", 
       :cardiac_signal=>"PPGData_epiRT_0211201009_21_22_80", 
       :cardiac_trigger=>"PPGTrig_epiRT_0211201009_21_22_80", 
-      :phys_directory=> "/Data/vtrak1/raw/test/fixtures/rpipe/mrt00015/dicoms/../cardiac", 
+      :phys_directory=> File.join(@runs_dir, '..', 'cardiac'), 
       :rep_time=>2.0, 
       :series_description=>"EPI  fMRI Task1"
     }]
@@ -74,7 +75,7 @@ describe "Test Phyiosnoise" do
   end
   
   it "should build a 3dRetroicor string" do
-    valid_cmd = "3dretroicor -prefix ptask1.nii -card /Data/vtrak1/raw/test/fixtures/rpipe/mrt00015/dicoms/../cardiac/PPGData_epiRT_0211201009_21_22_80 -resp /Data/vtrak1/raw/test/fixtures/rpipe/mrt00015/dicoms/../cardiac/RESPData_epiRT_0211201009_21_22_80 task1.nii"
+    valid_cmd = "3dretroicor -prefix ptask1.nii -card #{@runs_dir}/../cardiac/PPGData_epiRT_0211201009_21_22_80 -resp #{@runs_dir}/../cardiac/RESPData_epiRT_0211201009_21_22_80 task1.nii"
     valid_outfile = "p#{@scan_spec['label']}.nii"
     test_cmd, test_outfile = @recon_job.build_retroicor_cmd(@scan_spec['physio_files'], "#{@scan_spec['label']}.nii")
     

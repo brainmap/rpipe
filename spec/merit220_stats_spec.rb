@@ -6,13 +6,19 @@ describe "Unit testing for johnson.merit220.visit1" do
     @driver_file = File.join(File.dirname(__FILE__), 'drivers', 'mrt00000.yml')
     @driver = YAML.load_file(@driver_file)
 	  
-    @driver['rawdir']   = File.join(File.dirname(__FILE__), 'fixtures', 'rawdata', 'mrt00000', 'dicoms')
+    @driver['rawdir']   = File.join($MRI_DATA, 'mrt00000', 'dicoms')
     @driver['origdir']  = @origdir  = Dir.mktmpdir('orig_')
     @driver['procdir']  = @procdir  = Dir.mktmpdir('proc_')
     @driver['statsdir'] = @statsdir = Dir.mktmpdir('stats_')
     
-    @driver['jobs'][2]['responses']['directory'] = File.join(File.dirname(__FILE__), 'fixtures', 'rawdata', 'responses')
-    @valid_responses_options = @driver['jobs'][2]['responses']
+    @valid_responses_options = {
+      'directory' => File.join($MRI_DATA, 'responses'), 
+      'logfiles' => [
+        'mrt00000_abc_01012010_faces3_recognitionB.txt', 
+        'mrt00000_abc_01012010_faces3_recognitionA.txt'
+      ]
+    }
+      
     @pipe = RPipe.new(@driver)
     @job = @pipe.stats_jobs.first
   end
