@@ -30,6 +30,7 @@ describe "Unit testing for johnson.merit220.visit1" do
         @job.onsetsfiles = @job.create_onsets_files(@valid_responses_options, conditions)
         @job.onsetsfiles.should_not be_nil
         @job.onsetsfiles.should == ["mrt00000_faces3_recognitionB.mat", "mrt00000_faces3_recognitionA.mat"]
+        puts Dir.glob('*')
         @job.onsetsfiles.each do |onsetfile|
           File.exist?(onsetfile).should be_true
         end

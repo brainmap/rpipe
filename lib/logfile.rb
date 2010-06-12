@@ -38,16 +38,12 @@ class Logfile
   
   def write_csv(filename)
     File.open(filename, 'w') { |f| f.puts to_csv }
+    raise "Unable to write #{filename}" unless File.exist?(filename)
     @csv_filename = filename
   end
   
   def write_mat(prefix)
-    queue = MatlabQueue.new
-    # queue.paths << [
-    #   RPipe::ROOT_DIR, 
-    #   File.join(RPipe::ROOT_DIR, 'matlab_helpers')
-    # ]
-    
+    queue = MatlabQueue.new    
     queue.paths << [
       Pathname.new(File.join(File.dirname(__FILE__), 'matlab_helpers'))
     ]
@@ -59,6 +55,8 @@ class Logfile
     )"
     
     queue.run!
+    
+    raise ScriptError, "Problem writing #{prefix}.mat" unless File.exist?(prefix + '.mat')
     
     return prefix + '.mat'
   end

@@ -49,6 +49,7 @@ module DefaultStats
 	#
 	# responses = { 'directory' => '/path/to/files', 'logfiles' => ['subid_taskB.txt', 'subid_taskA.txt']}
 	def create_onsets_files(responses, conditions)
+	  onsets_csv_files = []
 	  onsets_mat_files = []
 	  Dir.chdir responses['directory'] do
 	    responses['logfiles'].each do |logfile|
@@ -59,7 +60,7 @@ module DefaultStats
         prefix = File.basename(logfile, '.txt').split("_").values_at(0,3,4).join("_")
   	    log = Logfile.new(logfile, *conditions)
         # puts log.to_csv
-  	    log.write_csv(prefix + '.csv')
+  	    onsets_csv_files << log.write_csv(prefix + '.csv')
   	    onsets_mat_files << log.write_mat(prefix)
       end
     end
