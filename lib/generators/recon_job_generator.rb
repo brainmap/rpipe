@@ -57,8 +57,8 @@ class ReconJobGenerator < JobGenerator
     scan['volumes_to_skip'] = @config['volumes_to_skip']
     scan['rep_time']        = raw_image_file.rep_time.in_seconds
     scan['label']           = dataset.series_description.escape_filename
-    scan['task']            = '?'
-    scan['physio_files']    = "#TODO"
+    # scan['task']            = '?'
+    # scan['physio_files']    = "#TODO"
     
     return scan
   end
