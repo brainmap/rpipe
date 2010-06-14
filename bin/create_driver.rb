@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
 require 'rubygems'
-require 'trollop'
+require 'optparse'
 require 'pp'
 require 'generators/workflow_generator'
 
 
 
-def run!
+def create!
   # Parse CLI Options and Spec File
   cli_options = parse_options
   spec_options = cli_options[:spec_file] ? load_spec(options[:spec_file]) : {}
@@ -17,13 +17,22 @@ def run!
 
   # Create a Workflow Generator and use it to create configure job.
   rawdir = ARGV.pop
-  pp WorkflowGenerator.new(rawdir, workflow_options).build
-  
+  workflow = WorkflowGenerator.new(rawdir, workflow_options)
+  if cli_options[:dry_run]
+    pp workflow.build
+  else
+    write_file(workflow.build)
+  end
 end
 
 
 
-
+def write_file(workflow_spec, filename = nil)
+  filename ||= workflow_spec['subid'] + '.yaml'
+  
+  File.open(filename, 'w') { |f| f.puts workflow_spec.to_yaml }
+  raise IOError, "Couldn't write #{filename}}" unless File.exist?(filename)
+end
 
 def load_spec(spec_file)
   if File.exist?(spec_file)
@@ -48,9 +57,9 @@ def parse_options
       options[:config][:responses_dir.to_s] = responses_dir
     end
 
-    # opts.on('-d', '--dry-run', "Display Script without executing it.") do
-    #   options[:dry_run] = true
-    # end
+    opts.on('-d', '--dry-run', "Display Driver without executing it.") do
+      options[:dry_run] = true
+    end
 
     opts.on_tail('-h', '--help',          "Show this message")          { puts(parser); exit }
     opts.on_tail("Example: #{File.basename(__FILE__)} mrt00001")
@@ -66,5 +75,5 @@ def parse_options
 end
 
 if __FILE__ == $0
-  run!
+  create!
 end
