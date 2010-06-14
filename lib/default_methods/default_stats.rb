@@ -51,6 +51,7 @@ module DefaultStats
 	def create_onsets_files(responses, conditions)
 	  onsets_csv_files = []
 	  onsets_mat_files = []
+	  wd = Dir.pwd
 	  Dir.chdir responses['directory'] do
 	    responses['logfiles'].each do |logfile|
   	    # Either Strip off the prefix directly without changing the name...
@@ -62,6 +63,10 @@ module DefaultStats
         # puts log.to_csv
   	    onsets_csv_files << log.write_csv(prefix + '.csv')
   	    onsets_mat_files << log.write_mat(prefix)
+      end
+      
+      [onsets_csv_files, onsets_mat_files].flatten.each do |response_file|
+	      FileUtils.move response_file, wd
       end
     end
     

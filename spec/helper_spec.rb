@@ -10,6 +10,7 @@ require 'tmpdir'
 require 'fileutils'
 require 'yaml'
 require 'pp'
+require 'rubygems'
 
 $MRI_DATA = ENV['MRI_DATA'] || '/Data/vtrak1/raw/test/fixtures/rpipe'
 

@@ -38,7 +38,7 @@ class Logfile
   
   def write_csv(filename)
     File.open(filename, 'w') { |f| f.puts to_csv }
-    raise "Unable to write #{filename}" unless File.exist?(filename)
+    raise ScriptError, "Unable to write #{filename}" unless File.exist?(filename)
     @csv_filename = filename
   end
   
@@ -47,6 +47,8 @@ class Logfile
     queue.paths << [
       Pathname.new(File.join(File.dirname(__FILE__), 'matlab_helpers'))
     ]
+    
+    raise ScriptError, "Can't find #{@csv_filename}" unless File.exist?(@csv_filename)
 
     queue << "prepare_onsets_xls( \
       '#{@csv_filename}', \
