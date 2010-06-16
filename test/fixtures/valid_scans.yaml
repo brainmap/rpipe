@@ -6,8 +6,8 @@
   rep_time: 2.0
   bold_reps: 167
   volumes_to_skip: 3
-  task: "?"
-  physio_files: "#TODO"
+  # task: "?"
+  # physio_files: "#TODO"
   # physio_files: 
   #   phys_directory: "../cardiac"
   #   series_description: "EPI  fMRI Task1"
@@ -22,8 +22,8 @@
   rep_time: 2.0
   bold_reps: 167
   volumes_to_skip: 3
-  task: "?"
-  physio_files: "#TODO"
+  # task: "?"
+  # physio_files: "#TODO"
 - label: EPI-Resting-fMRI
   dir: s09_epi
   type: func
@@ -31,5 +31,5 @@
   rep_time: 2.0
   bold_reps: 167
   volumes_to_skip: 3
-  task: "?"
-  physio_files: "#TODO"
+  # task: "?"
+  # physio_files: "#TODO"

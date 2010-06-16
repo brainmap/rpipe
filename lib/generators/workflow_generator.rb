@@ -23,20 +23,17 @@ class WorkflowGenerator < JobGenerator
     config_defaults = {}
     config_defaults['processing_dir'] = Dir.mktmpdir
     super config_defaults.merge(config)
-
-    @rawdir = rawdir
     
     config_requires 'responses_dir'
-  end
-  
-  def build
+    
+    @rawdir = rawdir
     @spec['rawdir'] = @rawdir
     @spec['subid'] = parse_subid
     
-    processing_dir = @config['processing_dir']
-    @spec['origdir']  = @config['origdir']  ||= File.join(processing_dir, @spec['subid'] + '_orig')
-    @spec['procdir']  = @config['procdir']  ||= File.join(processing_dir, @spec['subid'] + '_proc')
-    @spec['statsdir'] = @config['statsdir'] ||= File.join(processing_dir, @spec['subid'] + '_stats')
+  end
+  
+  def build    
+    configure_directories
     
     @spec['collision'] = 'destroy'
     
@@ -61,4 +58,23 @@ class WorkflowGenerator < JobGenerator
       
     subject_path.basename.to_s.split('_').first
   end
+  
+  def configure_directories
+    processing_dir = @config['processing_dir']
+    @spec['origdir']  = @config['origdir']  || parse_directory_format(@config['directory_formats']['origdir']) # || File.join(processing_dir, @spec['subid'] + '_orig')
+    @spec['procdir']  = @config['procdir']  || File.join(processing_dir, @spec['subid'] + '_proc')
+    @spec['statsdir'] = @config['statsdir'] || File.join(processing_dir, @spec['subid'] + '_stats')
+  end
+  
+  def parse_directory_format(fmt)
+    pp fmt
+    pp replacements = /\<.*\>/.match(fmt)
+    pp replacements.to_s
+    fmt.sub(/\<.*\>/, @spec[replacements.to_s])
+    #     # puts eval(instance_variable_get "@config['%s']" % replacements.to_s)
+    #     pp replacements
+    #     puts replacements.to_s
+    #     puts @config[replacements.to_s]
+  end
+    
 end

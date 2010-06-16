@@ -1,4 +1,4 @@
-require 'metamri'
+require '~/code/metamri/lib/metamri'
 require 'generators/job_generator'
 
 ########################################################################################################################
@@ -16,6 +16,7 @@ class ReconJobGenerator < JobGenerator
     # Add job-specific config defaults to config and initialize teh JobGenerator with them.
     config_defaults = {}
     config_defaults['epi_pattern'] = /fMRI/i
+    config_defaults['ignore_patterns'] = [/pcasl/i, /raw$/i]
     config_defaults['volumes_to_skip'] = 3
     super config_defaults.merge(config)
 
@@ -30,7 +31,8 @@ class ReconJobGenerator < JobGenerator
     scans = Array.new
     
     visit = VisitRawDataDirectory.new(@rawdir)
-    visit.scan
+    # Scan the datasets, ignoring unwanted (very large unused) directories.
+    visit.scan(:ignore_pattern => [@config['epi_pattern']])
     
     visit.datasets.each do |dataset|
       # Only build hashes for EPI datasets

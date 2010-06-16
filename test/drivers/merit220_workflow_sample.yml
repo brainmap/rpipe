@@ -1,0 +1,9 @@
+# Merit 220 Workflow Driver Sample
+study_procedure: johnson.merit220.visit1
+ignore_pattern:
+  - /pcasl/i
+  - /raw$/i
+directory_formats:
+  origdir: /Data/vtrak1/preprocessed/visits/johnson.merit220.visit1/<subid>/fmri/images
+  procdir: /Data/vtrak1/preprocessed/visits/johnson.merit220.visit1/<subid>/fmri/proc
+  statsdir: /Data/vtrak1/preprocessed/visits/johnson.merit220.visit1/<subid>/fmri/stats
