@@ -1,4 +1,6 @@
-require '~/code/metamri/lib/metamri'
+gem 'activeresource', '<=2.3.8'
+$LOAD_PATH.unshift('~/projects/metamri/lib')
+require 'metamri'
 require 'generators/job_generator'
 
 ########################################################################################################################

@@ -3,6 +3,7 @@ require 'yaml'
 require 'ftools'
 require 'fileutils'
 require 'pathname'
+require 'core_additions'
 require 'metamri/core_additions'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
@@ -39,7 +40,7 @@ class JobStep
 			# do nothing, use default implementation
 		else
 			require module_name
-			extend self.class.const_get(module_name)
+			extend self.class.const_get(module_name.dot_camelize)
 		end
 	end
 	

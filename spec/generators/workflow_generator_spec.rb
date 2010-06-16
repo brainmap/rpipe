@@ -6,7 +6,7 @@ describe "Workflow Generator" do
 	  @fixtures_dir = File.join File.dirname(__FILE__), '..', 'fixtures'
 	  @drivers_dir  = File.join File.dirname(__FILE__), '..', 'drivers'
     @workflow_driver = YAML.load_file(File.join @drivers_dir, 'merit220_workflow_sample.yml')
-    @rawdir = File.join $MRI_DATA, 'mrt00000', 'dicoms'
+    @rawdir = File.join $MRI_DATA, 'johnson.merit220.visit1', 'mrt00000', 'dicoms'
     @scans = YAML.load_file(File.join @fixtures_dir, 'valid_scans.yaml')
     rootdir = Pathname.new(File.join(File.dirname(__FILE__), '..', '..')).realpath.to_s
     @valid_recon_job_spec = {"step"=>"reconstruct", "scans"=> @scans}
@@ -30,6 +30,7 @@ describe "Workflow Generator" do
 	  @statsdir = Dir.mktmpdir('stats_')
 	  
 	  @valid_workflow_spec = {
+      "study_procedure" => "johnson.merit220.visit1",
       "subid"     => "mrt00000",
       "rawdir"    => @rawdir,
       "origdir"   => @origdir,
@@ -37,24 +38,54 @@ describe "Workflow Generator" do
 	    "statsdir"  => @statsdir,
       "collision" => "destroy",
       "jobs"      => @valid_job_params
-    }.merge @workflow_driver
+    }
 	  
-	  @valid_workflow_options = {'responses_dir' => File.join($MRI_DATA, 'responses')}
+	  @valid_workflow_options = {
+	    'responses_dir' => File.join($MRI_DATA, 'responses')
+	  }.merge @workflow_driver
     # @valid_pipe = RPipe.new(@valid_workflow_spec)
     
     @valid_directory_format = "/Data/vtrak1/preprocessed/visits/johnson.merit220.visit1/<subid>/fmri/orig"
+    @valid_multiple_substitution_directory_format = "/Data/vtrak1/preprocessed/visits/<study_procedure>/<subid>/fmri/orig"
   end
   
-  # it "should be valid when assigned known directories." do
-  #   workflow = WorkflowGenerator.new(@rawdir, @valid_workflow_options.merge(
-  #     {'origdir' => @origdir, 'procdir' => @procdir, 'statsdir' => @statsdir})).build
-  #   workflow.should == @valid_workflow_spec
-  # end
+  it "should be valid when assigned known directories without study procedure." do
+    options = @valid_workflow_options.merge(
+    {'origdir' => @origdir, 'procdir' => @procdir, 'statsdir' => @statsdir})
+    options.delete('study_procedure')
+    options
+      
+    pp workflow = WorkflowGenerator.new(@rawdir, options).build
+    workflow.should == @valid_workflow_spec
+  end
   
-  it "should parse directory format" do
+  it "should parse directory format with one substitution" do
     workflow = WorkflowGenerator.new(@rawdir, @valid_workflow_options)
-    puts @valid_directory_format
-    pp workflow.parse_directory_format @valid_directory_format
+    dir = workflow.parse_directory_format(@valid_directory_format)
+    dir.should == "/Data/vtrak1/preprocessed/visits/johnson.merit220.visit1/#{@valid_workflow_spec['subid']}/fmri/orig"
+  end
+  
+  it "should parse directory format with multiple substitutions" do
+    workflow = WorkflowGenerator.new(@rawdir, @valid_workflow_options)
+    dir = workflow.parse_directory_format(@valid_multiple_substitution_directory_format)
+    dir.should == "/Data/vtrak1/preprocessed/visits/#{@valid_workflow_spec['study_procedure']}/#{@valid_workflow_spec['subid']}/fmri/orig"    
+  end
+  
+  it "should parse directory format when directories are not explicitly given" do
+    pp options = @valid_workflow_options.dup.delete_if{|key, val| %w{origdir procdir statsdir}.include? key }
+    workflow = WorkflowGenerator.new(@rawdir, options)
+    dir = workflow.parse_directory_format(@valid_directory_format)
+    dir.should == "/Data/vtrak1/preprocessed/visits/#{@valid_workflow_spec['study_procedure']}/#{@valid_workflow_spec['subid']}/fmri/orig"    
+  end
+  
+  it "should guess a properly formed study procedure directory" do
+    workflow = WorkflowGenerator.new(@rawdir, @valid_workflow_options)
+    workflow.guess_study_procedure_from(@rawdir).should == 'johnson.merit220.visit1'
+  end
+  
+  it "should raise a ScriptError if study procedure directory cannot be guessed" do
+    workflow = WorkflowGenerator.new(@rawdir, @valid_workflow_options)
+    lambda {workflow.guess_study_procedure_from('/bad/study/directory')}.should raise_error ScriptError, /Could not guess/
   end
   
   after(:each) do

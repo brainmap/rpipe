@@ -10,7 +10,7 @@ require 'generators/workflow_generator'
 def create!
   # Parse CLI Options and Spec File
   cli_options = parse_options
-  spec_options = cli_options[:spec_file] ? load_spec(options[:spec_file]) : {}
+  spec_options = cli_options[:spec_file] ? load_spec(cli_options[:spec_file]) : {}
   
   workflow_options_defaults = {}
   workflow_options = workflow_options_defaults.merge(spec_options).merge(cli_options[:config])
@@ -61,7 +61,7 @@ def parse_options
       options[:dry_run] = true
     end
 
-    opts.on_tail('-h', '--help',          "Show this message")          { puts(parser); exit }
+    opts.on_tail('-h', '--help', "Show this message")  { puts(parser); exit }
     opts.on_tail("Example: #{File.basename(__FILE__)} mrt00001")
   end
   parser.parse!(ARGV)

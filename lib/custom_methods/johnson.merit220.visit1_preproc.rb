@@ -1,5 +1,5 @@
 require 'matlab_helpers/matlab_queue'
-module Merit220Preproc
+module JohnsonMerit220Visit1Preproc
 	
 	# Runs the preprocessing job, including spm job customization, run spm job, and handling motion issues.
 	# This function assumes a destination directory is set up; it will overwrite preexisting data.	Careful!
@@ -28,10 +28,10 @@ module Merit220Preproc
       File.join(@root_dir, 'matlab_helpers')
     ]
 
-	  queue << "Merit220Preproc('#{@procdir}/', \
+	  queue << "JohnsonMerit220Visit1Preproc('#{@procdir}/', \
     { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \
     { #{@bold_reps.join(' ') } }, \
-    'Merit220Preproc_job.m')"
+    'JohnsonMerit220Visit1_job.m')"
     
     puts queue.to_s
     queue.run!

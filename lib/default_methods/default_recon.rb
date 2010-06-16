@@ -84,13 +84,19 @@ module DefaultRecon
 	# In most cases this will be 3 volumes. Writes result in current working directory.
 	def strip_leading_volumes(infile, outfile, volume_skip, bold_reps)
 		flash "Stripping #{volume_skip.to_s} leading volumes: #{infile}"
-		system("fslroi #{infile} #{outfile} #{volume_skip.to_s} #{bold_reps.to_s}")
+		cmd = "fslroi #{infile} #{outfile} #{volume_skip.to_s} #{bold_reps.to_s}"
+		unless system(cmd)
+		  raise ScriptError, "Failed to strip volumes: #{cmd}"
+	  end
 	end
 	
 	# Uses to3d to slice time correct a 4D functional nifti file.	 Writes result in the current working directory.
 	def slice_time_correct(infile)
 		flash "Slice Timing Correction: #{infile}"
-		system("3dTshift -tzero 0 -tpattern alt+z -prefix a#{infile} #{infile}")
+		cmd = "3dTshift -tzero 0 -tpattern alt+z -prefix a#{infile} #{infile}"
+		unless system(cmd)
+		  raise ScriptError, "Failed to slice time correct: #{cmd}"
+	  end
 	end
 	
 	def generate_physiospec

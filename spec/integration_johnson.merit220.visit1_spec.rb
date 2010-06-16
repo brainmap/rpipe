@@ -5,7 +5,7 @@ describe "Integration Processing for Johnson.Merit220" do
   before(:all) do
     @driver_file = File.join(File.dirname(__FILE__), 'drivers', 'mrt00000.yml')
     @driver = YAML.load_file(@driver_file)	  
-    @driver['rawdir']   = File.join($MRI_DATA, 'mrt00000', 'dicoms')
+    @driver['rawdir']   = File.join($MRI_DATA, 'johnson.merit220.visit1', 'mrt00000', 'dicoms')
     @driver['origdir']  = @origdir  = Dir.mktmpdir('orig_')
     @driver['procdir']  = @procdir  = Dir.mktmpdir('proc_')
     @driver['statsdir'] = @statsdir = Dir.mktmpdir('stats_')

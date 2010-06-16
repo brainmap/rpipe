@@ -1,9 +1,20 @@
-# Merit 220 Workflow Driver Sample
+# Workflow Driver Sample
+# johnson.merit220.visit1
+# 6/15/2010
 study_procedure: johnson.merit220.visit1
 ignore_pattern:
   - /pcasl/i
   - /raw$/i
 directory_formats:
-  origdir: /Data/vtrak1/preprocessed/visits/johnson.merit220.visit1/<subid>/fmri/images
-  procdir: /Data/vtrak1/preprocessed/visits/johnson.merit220.visit1/<subid>/fmri/proc
-  statsdir: /Data/vtrak1/preprocessed/visits/johnson.merit220.visit1/<subid>/fmri/stats
+  origdir: /Data/vtrak1/preprocessed/visits/<study_procedure>/<subid>/fmri/images
+  procdir: /Data/vtrak1/preprocessed/visits/<study_procedure>/<subid>/fmri/proc
+  statsdir: /Data/vtrak1/preprocessed/visits/<study_procedure>/<subid>/fmri/stats_basic
+responses_dir: /Users/erik/projects/fixtures/rpipe/responses
+custom_methods:
+  preproc: true
+  stats: Merit220Stats
+  # Custom methods may be either true or listed explicitly.  If left as 
+  # true, they will require the dot and underscored default custom name,
+  # and include the camelcased name.  
+  # require 'johnson.merit220.visit1_stats'
+  # include JohnsonMerit220Visit1Stats
