@@ -23,7 +23,7 @@ module DefaultRecon
 				if scan_spec['type'] == "func"
 					strip_leading_volumes('tmp.nii', outfile, @volume_skip, scan_spec['bold_reps'])
 					if scan_spec['physio_files']
-            create_physiosnoise_regressors(scan_spec)
+            # create_physiosnoise_regressors(scan_spec)
             outfile = run_retroicor(scan_spec['physio_files'], outfile)
 				  end
 				  
@@ -44,6 +44,7 @@ module DefaultRecon
 	# Conventions: I****.dcm filenaming, I0002.dcm is second file in series, 
 	def reconstruct_scan(scan_spec, outfile)
 		scandir = File.join(@rawdir, scan_spec['dir'])
+		flash "Reconstruction: #{scandir}"
 		
 		Pathname.new(scandir).all_dicoms do |dicoms|
 		
@@ -58,8 +59,6 @@ module DefaultRecon
   		recon_cmd_format = 'to3d -skip_outliers %s -prefix tmp.nii "%s"'
 
   		timing_opts = timing_options(scan_spec, second_file)
-		
-  		flash "Reconstruction: #{scandir}"
 		
   		unless system(recon_cmd_format % [timing_opts, wildcard])
   			raise(IOError,"Failed to reconstruct scan: #{scandir}")
@@ -133,7 +132,18 @@ module DefaultRecon
     end
   end
 	
+	# Builds a properly formed 3dRetroicor command and returns the command and 
+	# output filename.
+	#
+	# Input a physio_files hash with keys:
+	#   :respiration_signal: RESPData_epiRT_0303201014_46_27_463
+  #   :respiration_trigger: RESPTrig_epiRT_0303201014_46_27_463
+  #   :phys_directory: cardiac/
+  #   :cardiac_signal: PPGData_epiRT_0303201014_46_27_463
+  #   :cardiac_trigger: PPGTrig_epiRT_0303201014_46_27_463
 	def build_retroicor_cmd(physio_files, file)
+    [:cardiac_signal, :respiration_signal].collect {|req| raise ScriptError, "Missing physio config: #{req}" unless physio_files.include?(req)}
+    
     prefix = 'p'
     unless Pathname.new(physio_files[:cardiac_signal]).absolute?
       cardiac_signal = File.join(@rawdir, physio_files[:phys_directory], physio_files[:cardiac_signal])

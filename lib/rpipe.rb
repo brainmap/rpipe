@@ -60,7 +60,7 @@ class JobStep
 			if @collision_policy == :destroy
 				puts "#{logging_tag} :: Deleting directory #{path}"
 				FileUtils.rm_rf(path)
-				FileUtils.mkdir(path)
+				FileUtils.mkdir_p(path)
 			elsif @collision_policy == :overwrite
 				puts "#{logging_tag} :: Overwriting inside directory #{path}"
 			else
@@ -68,7 +68,7 @@ class JobStep
 			end
 		else
 			puts "#{logging_tag} :: Creating new directory #{path}"
-			FileUtils.mkdir(path)
+			FileUtils.mkdir_p(path)
 		end
 	end
 	

@@ -49,7 +49,6 @@ class WorkflowGenerator < JobGenerator
     
     # Preproc
     preproc_options = {'scans' => jobs.first['scans']}
-    pp @spec
     config_step_method(preproc_options, 'preproc') if @config['custom_methods']
     jobs << PreprocJobGenerator.new(preproc_options).build
     
@@ -111,11 +110,17 @@ class WorkflowGenerator < JobGenerator
     raise ScriptError, "Could not guess study procedure from #{dir}"
   end
   
+  # Configure Custom Methods from the Workflow Driver
+  #
+  # Custom methods may be simply set to true for a given job or listed 
+  # explicitly.  If true, they will set the method to the a camelcased version
+  # of the study_procedure and step, i.e. JohnsonMerit220Visit1Stats
+  # If listed explicitly, it will set the step to the value listed.
   def config_step_method(options, step)
     if @config['custom_methods'][step].class == String
       options['method'] = @config['custom_methods'][step]
     elsif @config['custom_methods'][step] == true
-      options['method'] = [@config['study_procedure'], step.capitalize].join("_")
+      options['method'] = [@config['study_procedure'], step.capitalize].join("_").dot_camelize
     end
   end
     

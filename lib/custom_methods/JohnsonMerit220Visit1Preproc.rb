@@ -31,7 +31,7 @@ module JohnsonMerit220Visit1Preproc
 	  queue << "JohnsonMerit220Visit1Preproc('#{@procdir}/', \
     { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \
     { #{@bold_reps.join(' ') } }, \
-    'JohnsonMerit220Visit1_job.m')"
+    'JohnsonMerit220Visit1Preproc_job.m')"
     
     puts queue.to_s
     queue.run!

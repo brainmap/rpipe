@@ -10,7 +10,7 @@ describe "Workflow Generator" do
     @scans = YAML.load_file(File.join @fixtures_dir, 'valid_scans.yaml')
     rootdir = Pathname.new(File.join(File.dirname(__FILE__), '..', '..')).realpath.to_s
     @valid_recon_job_spec = {"step"=>"reconstruct", "scans"=> @scans}
-    @valid_preproc_job_spec = {"step"=>"preprocess", "bold_reps"=>[164, 164, 164]}
+    @valid_preproc_job_spec = {"step"=>"preprocess", "bold_reps"=>[164, 164, 164], "method" => "JohnsonMerit220Visit1Preproc"}
     @valid_stats_job_spec = {
       "step"=>"stats",
       "responses"=> {
@@ -19,7 +19,8 @@ describe "Workflow Generator" do
       },
       "conditions"=> ["new_correct", "new_incorrect", "old_correct", "old_incorrect"],
       "regressorsfiles"=> ["rp_amrt00000_EPI-fMRI-Task1.txt", "rp_amrt00000_EPI-fMRI-Task2.txt"],
-      "bold_reps"=>[164, 164]
+      "bold_reps"=>[164, 164],
+      "method" => "Merit220Stats"
     }
     
     

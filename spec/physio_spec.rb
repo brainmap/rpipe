@@ -82,6 +82,13 @@ describe "Test Phyiosnoise" do
     valid_cmd.should == test_cmd
     valid_outfile.should == test_outfile
   end
+  
+  it "should raise an error building a 3dRetroicor string if improperly configured" do
+    physio_files = @scan_spec['physio_files']
+    physio_files.delete(:cardiac_signal)
+    
+    lambda {@recon_job.build_retroicor_cmd(physio_files, "#{@scan_spec['label']}.nii") }.should raise_error ScriptError, /Missing .* cardiac/
+  end
 
   after(:each) do
     FileUtils.rm_r([@recon_job.origdir, @recon_job.procdir, @recon_job.statsdir])

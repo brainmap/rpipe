@@ -30,7 +30,7 @@ jobs:
         z_slices: 36
         
   - step: preprocess
-    method: johnson.merit220.visit1_preproc
+    method: JohnsonMerit220Visit1Preproc
     bold_reps:
       - 164
       - 164

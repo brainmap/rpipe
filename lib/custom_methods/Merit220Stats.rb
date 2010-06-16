@@ -40,7 +40,7 @@ module Merit220Stats
   
   # Finally runs the stats job 
   def run_stats_spm_job
-    images = Dir.glob(File.join(@statsdir, "sw*#{@subid}*task*.nii"))
+    images = Dir.glob(File.join(@statsdir, "sw*#{@subid}*[Tt]ask*.nii"))
     raise ScriptError, "Can't find any smoothed, warped images in #{@statsdir}" if images.empty?
     
     queue = MatlabQueue.new

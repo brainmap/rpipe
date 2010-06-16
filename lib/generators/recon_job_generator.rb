@@ -1,5 +1,5 @@
 gem 'activeresource', '<=2.3.8'
-$LOAD_PATH.unshift('~/projects/metamri/lib')
+$LOAD_PATH.unshift('~/projects/metamri/lib').unshift('~/code/metamri/lib')
 require 'metamri'
 require 'generators/job_generator'
 
@@ -34,7 +34,7 @@ class ReconJobGenerator < JobGenerator
     
     visit = VisitRawDataDirectory.new(@rawdir)
     # Scan the datasets, ignoring unwanted (very large unused) directories.
-    visit.scan(:ignore_pattern => [@config['epi_pattern']])
+    visit.scan(:ignore_patterns => [@config['ignore_patterns']].flatten)
     
     visit.datasets.each do |dataset|
       # Only build hashes for EPI datasets
