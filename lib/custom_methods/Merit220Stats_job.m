@@ -46,21 +46,18 @@ matlabbatch{3}.spm.stats.con.spmmat(1).tgt_spec{1}(2).value = 'e';
 matlabbatch{3}.spm.stats.con.spmmat(1).sname = 'Model estimation: SPM.mat File';
 matlabbatch{3}.spm.stats.con.spmmat(1).src_exbranch = substruct('.','val', '{}',{2}, '.','val', '{}',{1}, '.','val', '{}',{1});
 matlabbatch{3}.spm.stats.con.spmmat(1).src_output = substruct('.','spmmat');
-matlabbatch{3}.spm.stats.con.consess{1}.fcon.name = 'Omnibus F';
-matlabbatch{3}.spm.stats.con.consess{1}.fcon.convec = {[1 0 0 0 0 0 0 0 0 0 0 0 0 0
-                                                        0 1 0 0 0 0 0 0 0 0 0 0 0 0
-                                                        0 0 1 0 0 0 0 0 0 0 0 0 0 0
-                                                        0 0 0 1 0 0 0 0 0 0 0 0 0 0
-                                                        0 0 0 0 0 0 0 0 0 0 1 0 0 0
-                                                        0 0 0 0 0 0 0 0 0 0 0 1 0 0
-                                                        0 0 0 0 0 0 0 0 0 0 0 0 1 0
-                                                        0 0 0 0 0 0 0 0 0 0 0 0 0 1 ]
-                                                       }';
-matlabbatch{3}.spm.stats.con.consess{1}.fcon.sessrep = 'none';
-matlabbatch{3}.spm.stats.con.consess{2}.tcon.name = 'PV > NV';
-matlabbatch{3}.spm.stats.con.consess{2}.tcon.convec = [-1 -1 1 1];
-matlabbatch{3}.spm.stats.con.consess{2}.tcon.sessrep = 'repl';
-matlabbatch{3}.spm.stats.con.consess{3}.tcon.name = 'NV > PV';
-matlabbatch{3}.spm.stats.con.consess{3}.tcon.convec = [1 1 -1 -1];
-matlabbatch{3}.spm.stats.con.consess{3}.tcon.sessrep = 'repl';
+matlabbatch{3}.spm.stats.con.consess{1}.fcon.name       = '<UNDEFINED>';
+matlabbatch{3}.spm.stats.con.consess{1}.fcon.convec{1}  = '<UNDEFINED>';
+matlabbatch{3}.spm.stats.con.consess{1}.fcon.sessrep    = 'none';
+matlabbatch{3}.spm.stats.con.consess{2}.tcon.name       = '<UNDEFINED>';
+matlabbatch{3}.spm.stats.con.consess{2}.tcon.convec     = '<UNDEFINED>';
+matlabbatch{3}.spm.stats.con.consess{2}.tcon.sessrep    = 'repl';
+matlabbatch{3}.spm.stats.con.consess{3}.tcon.name       = '<UNDEFINED>';
+matlabbatch{3}.spm.stats.con.consess{3}.tcon.convec     = '<UNDEFINED>';
+matlabbatch{3}.spm.stats.con.consess{3}.tcon.sessrep    = 'repl';
 matlabbatch{3}.spm.stats.con.delete = 0;
+
+% NOTE! F-contrasts expect cells containing contrast arrays, while
+% T-contrasts expect the arrays themslves (hence the cell reference in
+% F-contrast definition (convec{1} = [];) but not in T-contrast definition
+% (convec = [];)
