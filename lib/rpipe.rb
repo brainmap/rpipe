@@ -1,3 +1,6 @@
+$LOAD_PATH.unshift(File.dirname(__FILE__))
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'custom_methods'))
+
 require 'rubygems'
 require 'yaml'
 require 'ftools'
@@ -5,9 +8,6 @@ require 'fileutils'
 require 'pathname'
 require 'core_additions'
 require 'metamri/core_additions'
-
-$LOAD_PATH.unshift(File.dirname(__FILE__))
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'custom_methods'))
 
 # prevent zipping in FSL programs
 ENV['FSLOUTPUTTYPE'] = 'NIFTI'

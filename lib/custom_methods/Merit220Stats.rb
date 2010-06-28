@@ -31,7 +31,12 @@ module Merit220Stats
 		  if @responses.nil?
 		    raise ScriptError, "Multiple conditions cannot be calculated because neither log response files nor onsets mat files have been defined."
 	    else
-	      puts @onsetsfiles = create_onsets_files(@responses, conditions)
+	      # Combine Old and New Misses into a single vector
+	      combine_options = {}
+	      combine_options[:combined_vector_title] = :misses
+        combine_options[:original_vector_titles] = [:new_misses, :old_misses]
+        
+	      @onsetsfiles = create_onsets_files(@responses, conditions, combine_options)
       end
     else
 	    link_onsets_files

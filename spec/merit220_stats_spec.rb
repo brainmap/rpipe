@@ -18,6 +18,11 @@ describe "Unit testing for johnson.merit220.visit1" do
         'mrt00000_abc_01012010_faces3_recognitionA.txt'
       ]
     }
+    
+    @valid_combine_options = {
+      :combined_vector_title => :misses,
+      :original_vector_titles => [:new_misses, :old_misses]      
+    }
       
     @pipe = RPipe.new(@driver)
     @job = @pipe.stats_jobs.first
@@ -28,6 +33,22 @@ describe "Unit testing for johnson.merit220.visit1" do
     Dir.mktmpdir do |dir|
       Dir.chdir dir do
         @job.onsetsfiles = @job.create_onsets_files(@valid_responses_options, conditions)
+        @job.onsetsfiles.should_not be_nil
+        @job.onsetsfiles.should == ["mrt00000_faces3_recognitionB.mat", "mrt00000_faces3_recognitionA.mat"]
+        puts Dir.glob('*')
+        @job.onsetsfiles.each do |onsetfile|
+          File.exist?(onsetfile).should be_true
+        end
+      end
+    end
+  end
+  
+  it "should convert logfiles into matfiles including misses as a condition" do
+    conditions = [:new_correct, :new_incorrect, :old_correct, :old_incorrect, :new_misses, :old_misses]
+    
+    Dir.mktmpdir do |dir|
+      Dir.chdir dir do
+        @job.onsetsfiles = @job.create_onsets_files(@valid_responses_options, conditions, @valid_combine_options)
         @job.onsetsfiles.should_not be_nil
         @job.onsetsfiles.should == ["mrt00000_faces3_recognitionB.mat", "mrt00000_faces3_recognitionA.mat"]
         puts Dir.glob('*')

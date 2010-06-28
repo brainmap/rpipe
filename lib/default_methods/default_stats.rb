@@ -48,7 +48,13 @@ module DefaultStats
 	# button-press response logfiles formatted by Presentation's SDF.
 	#
 	# responses = { 'directory' => '/path/to/files', 'logfiles' => ['subid_taskB.txt', 'subid_taskA.txt']}
-	def create_onsets_files(responses, conditions)
+	#
+	# Include an optional hash of options for combining condition vectors.
+	# :combined_vector_title = Name of new combined vector
+	# :original_vector_titles = Name of old vector to combine
+	# :options = Options for keeping old vectors or removing them.
+	# See details in Logfile#combine_vectors for more info.
+	def create_onsets_files(responses, conditions, combine_options = {})
 	  onsets_csv_files = []
 	  onsets_mat_files = []
 	  wd = Dir.pwd
@@ -60,6 +66,11 @@ module DefaultStats
         # mrt00000_abc_021110_faces3_recognitionA.txt
         prefix = File.basename(logfile, '.txt').split("_").values_at(0,3,4).join("_")
   	    log = Logfile.new(logfile, *conditions)
+  	    
+  	    unless combine_options.empty?
+  	      log.combine_vectors(combine_options[:combined_vector_title], combine_options[:original_vector_titles], combine_options[:options] || {})
+	      end
+	      
         # puts log.to_csv
   	    onsets_csv_files << log.write_csv(prefix + '.csv')
   	    onsets_mat_files << log.write_mat(prefix)

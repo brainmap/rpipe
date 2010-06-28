@@ -11,8 +11,14 @@ for i = 1:length(conditions)
 		
 	% Strip NaN's, but leave one nan if vector is empty (SPM's preference).
 	condition_onsets = condition_onsets(find(~isnan(condition_onsets)));
-	if length(condition_onsets) == 0;
-		condition_onsets=[nan];
+	
+    % Allow for conditions called 'misses' to be dropped from onsets.
+    if length(condition_onsets) == 0;
+		if ~strcmp(condition, 'misses')
+            condition_onsets=[nan];
+        else
+            continue
+        end
 	end
 	
 	% Format cell array for SPM's multiple conditions
