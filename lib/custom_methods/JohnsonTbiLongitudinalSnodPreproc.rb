@@ -1,5 +1,5 @@
 require 'matlab_helpers/matlab_queue'
-module JohnsonMerit220Visit1Preproc
+module JohnsonTbiLongitudinalSnodPreproc
 	
 	# Runs the preprocessing job, including spm job customization, run spm job, and handling motion issues.
 	# This function assumes a destination directory is set up; it will overwrite preexisting data.	Careful!
@@ -23,11 +23,12 @@ module JohnsonMerit220Visit1Preproc
 	  raise ScriptError, "Can't find any slice-time corrected images in #{@origdir}" if images.empty?
 	  queue = MatlabQueue.new
 	  queue.paths << ['/Applications/spm/spm8/spm8_current', 
+	    '/apps/spm/spm8_current',
       File.join(@root_dir, 'custom_methods'), 
       File.join(@root_dir, 'matlab_helpers')
     ]
 
-	  queue << "JohnsonMerit220Visit1Preproc('#{@procdir}/', \
+	  queue << "JohnsonTbiLongitudinalSnodPreproc('#{@procdir}/', \
     { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \
     { #{@bold_reps.join(' ') } }, \
     'JohnsonMerit220Visit1Preproc_job.m')"

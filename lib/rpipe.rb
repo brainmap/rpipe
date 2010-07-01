@@ -6,6 +6,8 @@ require 'yaml'
 require 'ftools'
 require 'fileutils'
 require 'pathname'
+require 'tmpdir'
+require 'erb'
 require 'core_additions'
 require 'metamri/core_additions'
 
@@ -239,11 +241,11 @@ class RPipe
 	
 	private
 	
-	# Read the YAML file and return the Driver Configuration.
+	# Read the YAML file, parses it with ERB and returns the Driver Configuration.
 	# Raises an error if the file is not found in the file system.
 	def read_driver_file(driver_file)
 		raise(IOError, "Driver file not found: #{driver_file}") unless File.exist?(driver_file)
-		YAML.load_file(driver_file)	  
+		YAML.load(ERB.new(File.read(driver_file)).result) 
   end
   
   # To compare jobs look at their configuration, not ruby object identity.

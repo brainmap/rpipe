@@ -1,0 +1,69 @@
+--- 
+subid: tbi000
+origdir:  <%= Dir.mktmpdir('orig') %>
+procdir:  <%= Dir.mktmpdir('proc') %>
+statsdir: <%= Dir.mktmpdir('stats') %>
+study_procedure: johnson.tbi.longitudinal.snod
+task_onsets: /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/snod_onsets.yml
+collision: overwrite
+
+jobs: 
+- step: reconstruct
+  rawdir: /Data/vtrak1/raw/test/fixtures/rpipe/johnson.tbi.longitudinal.snod/tbi000_1/raw
+  scans: 
+  - label: SnodB_v1
+    pfile: P38400.7
+    type: func
+    volumes_to_skip: 3
+    bold_reps: 141
+    task: snodB
+  - label: SnodA_v1
+    pfile: P38912.7
+    type: func
+    volumes_to_skip: 3
+    bold_reps: 141
+    task: snodA
+- step: reconstruct
+  rawdir: /Data/vtrak1/raw/test/fixtures/rpipe/johnson.tbi.longitudinal.snod/tbi000_2/raw
+  scans: 
+  - label: SnodC_v2
+    pfile: P32256.7
+    type: func
+    volumes_to_skip: 3
+    bold_reps: 141
+    task: snodC
+  - label: SnodD_v2
+    pfile: P32768.7
+    type: func
+    volumes_to_skip: 3
+    bold_reps: 141
+    task: snodD
+- step: reconstruct
+  rawdir: /Data/vtrak1/raw/test/fixtures/rpipe/johnson.tbi.longitudinal.snod/tbi000_3/raw
+  scans: 
+  - label: SnodA_v3
+    pfile: P60416.7
+    type: func
+    volumes_to_skip: 3
+    bold_reps: 141
+    task: snodA
+  - label: SnodB_v3
+    pfile: P60416.7
+    type: func
+    volumes_to_skip: 3
+    bold_reps: 141
+    task: snodB
+- step: preprocess
+  method: JohnsonTbiLongitudinalSnodPreproc
+  bold_reps:
+    - 138
+    - 138
+    - 138
+    - 138
+    - 138
+    - 138
+# - step: stats
+#   method: JohnsonTbiLongitudinalSnodStats
+  # regressorsfiles: 
+  # - rp_amrt00020_EPI-fMRI-Task1.txt
+  # - rp_amrt00020_EPI-fMRI-Task2.txt

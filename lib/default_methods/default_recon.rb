@@ -18,10 +18,9 @@ module DefaultRecon
 			@scans.each_with_index do |scan_spec, i|
 				outfile = "%s_%s.nii" % [@subid, scan_spec['label']]
 				
-				reconstruct_scan(scan_spec, 'tmp.nii')
+				reconstruct_scan(scan_spec, outfile)
 				
 				if scan_spec['type'] == "func"
-					strip_leading_volumes('tmp.nii', outfile, @volume_skip, scan_spec['bold_reps'])
 					if scan_spec['physio_files']
             # create_physiosnoise_regressors(scan_spec)
             outfile = run_retroicor(scan_spec['physio_files'], outfile)
@@ -32,7 +31,7 @@ module DefaultRecon
 					File.copy('tmp.nii', outfile)
 				end
 				
-				File.delete('tmp.nii')
+				File.delete('tmp.nii') if File.exist? 'tmp.nii'
 			end
 		end
 	end
@@ -42,28 +41,14 @@ module DefaultRecon
 	# Reconstructs a scan from dicoms to nifti, anatomical or functional.	 Uses a scan_spec hash to drive.
 	# Writes the result in current working directory. Raises an error if to3d system call fails.
 	# Conventions: I****.dcm filenaming, I0002.dcm is second file in series, 
-	def reconstruct_scan(scan_spec, outfile)
-		scandir = File.join(@rawdir, scan_spec['dir'])
-		flash "Reconstruction: #{scandir}"
-		
-		Pathname.new(scandir).all_dicoms do |dicoms|
-		
-  		# second_file = File.join(scandir, 'I0002.dcm')
-  		# wildcard = File.join(scandir,'I*dcm')
-  		
-  		local_scandir = File.dirname(dicoms.first)
-		
-  		second_file = Dir.glob( File.join(local_scandir, "*0002*") )
-  		wildcard = File.join(local_scandir, "*.[0-9]*")
-		
-  		recon_cmd_format = 'to3d -skip_outliers %s -prefix tmp.nii "%s"'
-
-  		timing_opts = timing_options(scan_spec, second_file)
-		
-  		unless system(recon_cmd_format % [timing_opts, wildcard])
-  			raise(IOError,"Failed to reconstruct scan: #{scandir}")
-  		end
-		end
+	def reconstruct_scan(scan_spec, outfile)	
+		if scan_spec['dir']
+		  reconstruct_dicom_sequence(scan_spec, 'tmp.nii')
+			strip_leading_volumes('tmp.nii', outfile, @volume_skip, scan_spec['bold_reps'])
+	  elsif scan_spec['pfile']
+	    reconstruct_pfile_sequence(scan_spec, outfile)
+    else raise ConfigError, "Scan must list either a pfile or a dicom directory."
+    end
 	end
 	
 	# Determines the proper timing options to pass to to3d for functional scans.	Must pass a static path to
@@ -83,7 +68,7 @@ module DefaultRecon
 	# In most cases this will be 3 volumes. Writes result in current working directory.
 	def strip_leading_volumes(infile, outfile, volume_skip, bold_reps)
 		flash "Stripping #{volume_skip.to_s} leading volumes: #{infile}"
-		cmd = "fslroi #{infile} #{outfile} #{volume_skip.to_s} #{bold_reps.to_s}"
+		puts cmd = "fslroi #{infile} #{outfile} #{volume_skip.to_s} #{bold_reps.to_s}"
 		unless system(cmd)
 		  raise ScriptError, "Failed to strip volumes: #{cmd}"
 	  end
@@ -161,6 +146,64 @@ module DefaultRecon
     return icor_cmd, outfile
   end
   
+  private
+  
+  def reconstruct_dicom_sequence(scan_spec, outfile)
+    scandir = File.join(@rawdir, scan_spec['dir'])
+		flash "Dicom Reconstruction: #{scandir}"
+		Pathname.new(scandir).all_dicoms do |dicoms|
+		
+  		# second_file = File.join(scandir, 'I0002.dcm')
+  		# wildcard = File.join(scandir,'I*dcm')
+  		
+  		local_scandir = File.dirname(dicoms.first)
+		
+  		second_file = Dir.glob( File.join(local_scandir, "*0002*") )
+  		wildcard = File.join(local_scandir, "*.[0-9]*")
+		
+  		recon_cmd_format = 'to3d -skip_outliers %s -prefix tmp.nii "%s"'
+
+  		timing_opts = timing_options(scan_spec, second_file)
+		
+  		unless system(recon_cmd_format % [timing_opts, wildcard])
+  			raise(IOError,"Failed to reconstruct scan: #{scandir}")
+  		end
+		end
+  end
+  
+  def reconstruct_pfile_sequence(scan_spec, outfile)
+    puts outfile
+    base_pfile_path = File.join(@rawdir, scan_spec['pfile'])
+    pfile_path = File.exist?(base_pfile_path) ? base_pfile_path : base_pfile_path + '.bz2'
+    
+    raise IOError, "#{pfile_path} does not exist." unless File.exist?(pfile_path)
+      
+		flash "Pfile Reconstruction: #{pfile_path}"
+		Pathname.new(pfile_path).local_copy do |pfile|
+		  reconstruct_pfile(pfile, outfile, scan_spec['volumes_to_skip'])
+	  end    
+  end
+  
+  # Reconstructs a single pfile into the epirecon default brik/head when
+  # given a temporary working directory, path to the pfile and the task to
+  # use when naming the output.
+  def reconstruct_pfile(pfile, label, volumes_to_skip = 3, refdat_stem = 'ref.dat')
+		setup_refdat(refdat_stem)
+    epirecon_cmd_format = "epirecon_ex -f %s -NAME %s -skip %d -scltype=0"
+		epirecon_cmd = epirecon_cmd_format % [pfile, label, volumes_to_skip]
+		puts epirecon_cmd
+		puts output = `#{epirecon_cmd}`
+		puts Dir.pwd
+		puts Dir.glob('*')
+  end
+  
+  def setup_refdat(refdat_stem)
+    base_refdat_path = File.join(@rawdir, refdat_stem)
+    refdat_path = File.exist?(base_refdat_path) ? base_refdat_path : base_refdat_path + ".bz2"
+    raise IOError, "#{refdat_path} does not exist." unless File.exist?(refdat_path)
+    local_refdat_file = Pathname.new(refdat_path).local_copy
+    FileUtils.ln_s(local_refdat_file, Dir.pwd, :force => true)
+  end
 
 	
 end
