@@ -18,7 +18,7 @@ class ReconJobGenerator < JobGenerator
     # Add job-specific config defaults to config and initialize teh JobGenerator with them.
     config_defaults = {}
     config_defaults['epi_pattern'] = /fMRI/i
-    config_defaults['ignore_patterns'] = [/pcasl/i, /raw$/i]
+    config_defaults['ignore_patterns'] = [/pcasl/i]
     config_defaults['volumes_to_skip'] = 3
     super config_defaults.merge(config)
 

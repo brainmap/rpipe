@@ -44,17 +44,20 @@ module DefaultStats
 		# TODO
 	end
 	
+	# Create onsets files using logfile responses for given conditions.
+	#
 	# Responses is a hash containing a directory and filenames of the .txt
 	# button-press response logfiles formatted by Presentation's SDF.
 	#
 	# responses = { 'directory' => '/path/to/files', 'logfiles' => ['subid_taskB.txt', 'subid_taskA.txt']}
 	#
-	# Include an optional hash of options for combining condition vectors.
-	# :combined_vector_title = Name of new combined vector
-	# :original_vector_titles = Name of old vector to combine
-	# :options = Options for keeping old vectors or removing them.
-	# See details in Logfile#combine_vectors for more info.
-	def create_onsets_files(responses, conditions, combine_options = {})
+	# Conditions is an array of vector labels to extract from the .txt file
+	# Each label may be either an individual condition or a hash of multiple 
+	# conditions, with the combined label as the key and the separate labels as
+	# values.
+	#
+	# conditions = [:new, :old, {:misses => [:new_misses, :old_misses]} ]
+	def create_onsets_files(responses, conditions)
 	  onsets_csv_files = []
 	  onsets_mat_files = []
 	  wd = Dir.pwd
@@ -67,10 +70,6 @@ module DefaultStats
         prefix = File.basename(logfile, '.txt').split("_").values_at(0,3,4).join("_")
   	    log = Logfile.new(logfile, *conditions)
   	    
-  	    unless combine_options.empty?
-  	      log.combine_vectors(combine_options[:combined_vector_title], combine_options[:original_vector_titles], combine_options[:options] || {})
-	      end
-	      
         # puts log.to_csv
   	    onsets_csv_files << log.write_csv(prefix + '.csv')
   	    onsets_mat_files << log.write_mat(prefix)

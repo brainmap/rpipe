@@ -20,7 +20,16 @@ class Logfile
   def initialize(path, *conditions)
     @textfile = path
     @textfile_data = []
-    @conditions = conditions
+    @conditions = conditions.select {|cond| cond.respond_to? 'to_sym'  }
+    
+    # Add the keys of any hashes (the combined conditions) to the list of 
+    # conditions and add the separate vectors to the list of combined_conditions
+    @combined_conditions = []
+    conditions.select {|cond| cond.respond_to? 'keys' }.each do |cond|
+      cond.keys.collect {|key| @conditions << key }
+      @combined_conditions << cond
+    end
+    
     raise IOError, "Can't find file #{path}" unless File.exist?(path)
     File.open(path, 'r').each do |line| 
       @textfile_data << line.split(/[\,\:\n\r]+/).each { |val| val.strip } 
@@ -28,10 +37,15 @@ class Logfile
     
     raise IOError, "Problem reading #{@textfile} - no data found." if @textfile_data.empty?
 
+    if @conditions.empty?
+      raise ScriptError, "Could not set conditions #{conditions}" unless conditions.empty?
+    end
+
   end
   
   def condition_vectors
     return @vectors if @vectors
+    raise ScriptError, "Conditions must be set to extract vectors" if @conditions.empty?
     vectors = extract_condition_vectors(@conditions)
     @vectors = zero_and_convert_to_reps(vectors)
   end
@@ -91,7 +105,8 @@ class Logfile
   def self.summarize_directory(directory)
     table = Ruport::Data::Table.new
     Dir.glob(File.join(directory, '*.txt')).each do |logfile| 
-      lf = Logfile.new(logfile)      
+      # Intialize a logfile without any conditions.
+      lf = Logfile.new(logfile)
       table << lf.ruport_summary
       table.column_names = lf.summary_attributes if table.column_names.empty?
     end
@@ -138,17 +153,12 @@ class Logfile
   end
   
   # Combine vectors into a new one (new_misses + old_misses = misses)
-  def combine_vectors(combined_vector_title, original_vector_titles, options = {:keep_old_vectors => false})
-    # Add the combined vectors to @vectors
+  def combine_vectors(combined_vector_title, original_vector_titles)
+    # Add the combined vectors to the vectors instance variable.
     condition_vectors[combined_vector_title] = combined_vectors(original_vector_titles)
     
     # Add the new condition to @conditions
     @conditions << combined_vector_title
-    
-    unless options[:keep_old_vectors]
-      condition_vectors.delete_if {|key,val| original_vector_titles.include?(key)} 
-      @conditions.delete_if {|key,val| original_vector_titles.include?(key)}
-    end
   end
     
   private
@@ -245,16 +255,30 @@ class Logfile
       # Headers are written in the Textfile as "New(Correct)".
       # Convert them to proper condition names - downcase separated by underscores
       header = line.first.gsub(/(\(|\))/, '_').downcase.chomp("_").to_sym
-      if conditions.include?(header);
-        # Make sure this isn't a column line inside the logfile.
-        if line[1] =~ /time/ 
-          vectors[header] = line[2..-1].collect {|val| val.to_f }
+      vector = line[2..-1].collect {|val| val.to_f } if line[2..-1]
+
+      # Make sure this isn't a column line inside the logfile.
+      if line[1] =~ /time/ 
+        # Check if this vector matches any combined conditions.
+        @combined_conditions.each do |vector_group|
+          vector_group.each_pair do |key, vals| 
+            if vals.include?(header)
+              vectors[key] = vectors[key] ? vector.collect{ |timepoint| vectors[key] << timepoint} : vector
+              vectors[key].flatten!
+            end
+          end
         end
+        
+        # Check if this vector matches a single condition.
+        vectors[header] = vector if @conditions.include?(header);
       end
     end
     
-    raise ScriptError, "Unable to read vectors for #{@textfile}" if vectors.empty?
+    # Ensure that the vecotors are in order.
+    vectors.each_value { |vector| vector.sort! }
     
+    raise ScriptError, "Unable to read vectors for #{@textfile}" if vectors.empty?
+        
     return vectors
   end
   

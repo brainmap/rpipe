@@ -1,7 +1,7 @@
 require 'logfile'
 module Merit220Stats
 
-	DEFAULT_CONDITIONS = [:new_correct_, :new_incorrect_, :old_correct_, :old_incorrect]
+	DEFAULT_CONDITIONS = [:new_correct_, :new_incorrect_, :old_correct_, :old_incorrect, {:misses => [:new_misses, :old_misses]} ]
   
   # runs the complete set of tasks using data in a subject's "proc" directory and a preconfigured template spm job.
 	def run_first_level_stats
@@ -23,20 +23,15 @@ module Merit220Stats
   end
   
   def setup_conditions
-    @conditions = @conditions ? @conditions.collect! {|c| c.to_sym} : DEFAULT_CONDITIONS 
+    @conditions = @conditions ? @conditions.collect! {|c| c.to_sym if c.respond_to? :to_sym } : DEFAULT_CONDITIONS 
   end
   
   def create_or_link_onsets_files
     if @onsetsfiles.nil?
 		  if @responses.nil?
-		    raise ScriptError, "Multiple conditions cannot be calculated because neither log response files nor onsets mat files have been defined."
+		    raise ScriptError, "Condition vectors cannot be created because neither log response files nor onsets mat files have been specified."
 	    else
-	      # Combine Old and New Misses into a single vector
-	      combine_options = {}
-	      combine_options[:combined_vector_title] = :misses
-        combine_options[:original_vector_titles] = [:new_misses, :old_misses]
-        
-	      @onsetsfiles = create_onsets_files(@responses, conditions, combine_options)
+	      @onsetsfiles = create_onsets_files(@responses, conditions)
       end
     else
 	    link_onsets_files

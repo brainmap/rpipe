@@ -2,7 +2,7 @@
 # johnson.merit220.visit1
 # 6/15/2010
 study_procedure: johnson.merit220.visit1
-ignore_pattern:
+ignore_patterns:
   - /pcasl/i
   - /raw$/i
 directory_formats:

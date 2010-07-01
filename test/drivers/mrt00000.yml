@@ -57,8 +57,9 @@ jobs:
       - new_incorrect
       - old_correct
       - old_incorrect
-      - new_misses
-      - old_misses
+      - misses:
+        - new_misses
+        - old_misses
     bold_reps:
       - 164
       - 164
