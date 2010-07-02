@@ -6,6 +6,8 @@ function [] = JohnsonTbiLongitudinalSnodPreproc(studypath, images, image_boldrep
 % '/private/tmp/mrt00015_orig/mrt00015_preproc_job.m') 
 % 
 
+spm('defaults', 'FMRI');
+
 % List of open inputs
 % Realign: Estimate: Session - cfg_files
 % Realign: Estimate: Session - cfg_files
@@ -20,5 +22,5 @@ for crun = 1:nrun
 			inputs{index, crun} = CreateFunctionalVolumeStruct(studypath, images{index}, image_boldreps{index}); % Realign: Estimate: Session - cfg_files
     end
 end
-spm('defaults', 'FMRI');
+
 spm_jobman('serial', jobs, '', inputs{:});

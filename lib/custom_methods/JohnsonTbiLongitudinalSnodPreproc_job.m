@@ -80,7 +80,7 @@ matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(6).tgt_spec{1}(2).va
 matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(6).sname = 'Realign: Estimate: Realigned Images (Sess 6)';
 matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(6).src_exbranch = substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1});
 matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(6).src_output = substruct('.','sess', '()',{6}, '.','cfiles');
-matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.template = {'/apps/spm/spm8_current/templates/EPI.nii,1'};
+matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.template = {[spm('Dir') '/templates/EPI.nii,1']};
 matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.weight = '';
 matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.smosrc = 8;
 matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.smoref = 0;

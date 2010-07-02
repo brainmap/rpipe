@@ -11,13 +11,13 @@ jobs:
 - step: reconstruct
   rawdir: /Data/vtrak1/raw/test/fixtures/rpipe/johnson.tbi.longitudinal.snod/tbi000_1/raw
   scans: 
-  - label: SnodB_v1
+  - label: v1_snodB
     pfile: P38400.7
     type: func
     volumes_to_skip: 3
     bold_reps: 141
     task: snodB
-  - label: SnodA_v1
+  - label: v1_snodA
     pfile: P38912.7
     type: func
     volumes_to_skip: 3
@@ -26,14 +26,14 @@ jobs:
 - step: reconstruct
   rawdir: /Data/vtrak1/raw/test/fixtures/rpipe/johnson.tbi.longitudinal.snod/tbi000_2/raw
   scans: 
-  - label: SnodC_v2
-    pfile: P32256.7
+  - label: v2_snodC
+    pfile: P33280.7
     type: func
     volumes_to_skip: 3
     bold_reps: 141
     task: snodC
-  - label: SnodD_v2
-    pfile: P32768.7
+  - label: v2_snodD
+    pfile: P33792.7
     type: func
     volumes_to_skip: 3
     bold_reps: 141
@@ -41,18 +41,19 @@ jobs:
 - step: reconstruct
   rawdir: /Data/vtrak1/raw/test/fixtures/rpipe/johnson.tbi.longitudinal.snod/tbi000_3/raw
   scans: 
-  - label: SnodA_v3
-    pfile: P60416.7
-    type: func
-    volumes_to_skip: 3
-    bold_reps: 141
-    task: snodA
-  - label: SnodB_v3
-    pfile: P60416.7
+  - label: v3_snodB
+    pfile: P61440.7
     type: func
     volumes_to_skip: 3
     bold_reps: 141
     task: snodB
+  - label: v3_snodA
+    pfile: P61952.7
+    type: func
+    volumes_to_skip: 3
+    bold_reps: 141
+    task: snodA
+        
 - step: preprocess
   method: JohnsonTbiLongitudinalSnodPreproc
   bold_reps:
@@ -62,8 +63,30 @@ jobs:
     - 138
     - 138
     - 138
-# - step: stats
-#   method: JohnsonTbiLongitudinalSnodStats
-  # regressorsfiles: 
-  # - rp_amrt00020_EPI-fMRI-Task1.txt
-  # - rp_amrt00020_EPI-fMRI-Task2.txt
+
+- step: stats
+  method: JohnsonTbiLongitudinalSnodStats
+  onsetsfiles:
+  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodB_vectors.mat
+  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodA_vectors.mat
+  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodC_vectors.mat
+  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodD_vectors.mat
+  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodB_vectors.mat
+  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodA_vectors.mat  
+  regressorsfiles: 
+  - rp_atbi000_v1_snodB.txt
+  - rp_atbi000_v1_snodA.txt
+  - rp_atbi000_v2_snodC.txt
+  - rp_atbi000_v2_snodD.txt
+  - rp_atbi000_v3_snodB.txt
+  - rp_atbi000_v3_snodA.txt
+  bold_reps:
+    - 138
+    - 138
+    - 138
+    - 138
+    - 138
+    - 138
+  conditions:
+    - new
+    - old

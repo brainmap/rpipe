@@ -48,11 +48,12 @@ module DefaultPreproc
 		system("runSpmJob.sh #{thisjob}")
 	end
 	
-	# Calculates the realignment motion derivatives and checks that displacement in all directions was less than
-	# the MOTION_THRESHOLD.	 Operates on all file in the current working directory that match rp_a*txt (SPM convention).
-	# Uses two shell scripts that must both be available on the local machine:
-	# - calc_derivs.sh
-	# - fmri_motion_check.sh
+  # Calculates the realignment motion derivatives and checks that displacement
+  # in all directions was less than the MOTION_THRESHOLD. Operates on all files
+  # in the current working directory that match rp_a*txt (SPM convention). Uses
+  # two shell scripts that must both be available on the local machine: 
+  # - calc_derivs.sh 
+  # - fmri_motion_check.sh
 	def deal_with_motion
 		flash "Calculating motion derivatives and checking for excessive motion"
 		Dir.glob("rp_a*txt").each do |rp|

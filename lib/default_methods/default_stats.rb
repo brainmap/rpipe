@@ -28,7 +28,7 @@ module DefaultStats
 	def link_onsets_files
 		@onsetsfiles.each do |ofile|
 			# Check if File Path is Absolute.  If not link from procdir/onsets
-			opath = File.expand_path(ofile) == ofile ? ofile : File.join(@procdir, 'onsets', ofile)
+			opath = Pathname.new(ofile).absolute? ? ofile : File.join(@procdir, 'onsets', ofile)
 			system("ln -s #{File.expand_path(opath)} #{Dir.pwd}")
 		end
 	end

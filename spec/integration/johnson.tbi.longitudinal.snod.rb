@@ -21,32 +21,32 @@ describe "Integration Processing for Johnson.Tbi.Longitudinal.Snod" do
     
   end
   
-  it "should reconstruct raw data" do
-    pipe = RPipe.new(@driver)
-    pipe.recon_jobs.each do |recon_job|
-      recon_job.perform
-    end
-    @origdir = @driver['origdir']
-    Dir.compare_directories(@origdir, @completed_orig_directory)
-  end
-   
-  it "should preprocess raw data" do
-    @driver['origdir']  = @origdir || @completed_orig_directory
-    pipe = RPipe.new(@driver)
-    p = pipe.preproc_jobs.first
-    p.perform
-    @procdir = @driver['procdir']
-    Dir.compare_directories(@procdir, @completed_proc_directory)    
-  end
-  # 
-  # it "should run stats on processed data" do
-  #   @driver['procdir'] = @procdir || @completed_proc_directory
+  # it "should reconstruct raw data" do
   #   pipe = RPipe.new(@driver)
-  #   s = pipe.stats_jobs.first
-  #   s.perform
-  #   @statsdir = @driver['statsdir']
-  #   # Dir.compare_directories(@statsdir, @completed_stats_directory)
+  #   pipe.recon_jobs.each do |recon_job|
+  #     recon_job.perform
+  #   end
+  #   @origdir = @driver['origdir']
+  #   Dir.compare_directories(@origdir, @completed_orig_directory)
   # end
+   
+  # it "should preprocess raw data" do
+  #   @driver['origdir']  = @origdir || @completed_orig_directory
+  #   pipe = RPipe.new(@driver)
+  #   p = pipe.preproc_jobs.first
+  #   p.perform
+  #   @procdir = @driver['procdir']
+  #   Dir.compare_directories(@procdir, @completed_proc_directory)    
+  # end
+  # 
+  it "should run stats on processed data" do
+    @driver['procdir'] = @procdir || @completed_proc_directory
+    pipe = RPipe.new(@driver)
+    s = pipe.stats_jobs.first
+    s.perform
+    @statsdir = @driver['statsdir']
+    # Dir.compare_directories(@statsdir, @completed_stats_directory)
+  end
 
 end
 

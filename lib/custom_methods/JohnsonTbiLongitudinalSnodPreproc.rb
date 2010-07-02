@@ -31,7 +31,7 @@ module JohnsonTbiLongitudinalSnodPreproc
 	  queue << "JohnsonTbiLongitudinalSnodPreproc('#{@procdir}/', \
     { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \
     { #{@bold_reps.join(' ') } }, \
-    'JohnsonMerit220Visit1Preproc_job.m')"
+    'JohnsonTbiLongitudinalSnodPreproc_job.m')"
     
     puts queue.to_s
     queue.run!
