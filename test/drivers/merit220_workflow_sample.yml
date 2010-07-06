@@ -12,4 +12,4 @@ directory_formats:
 responses_dir: /Data/vtrak1/raw/test/fixtures/rpipe/responses
 custom_methods:
   preproc: true
-  stats: Merit220Stats
+  stats: true

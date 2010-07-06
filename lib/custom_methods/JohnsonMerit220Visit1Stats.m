@@ -28,22 +28,32 @@ eval(['load ' conditions{1}]);
 
 switch numel(names)
     case 2 % New, Old
-        fcontrast_vector = [1 0 
-                            0 1 ];
+        fcontrast_vector = [1 0 zeros(1,8)
+                            0 1 zeros(1,8)
+                            zeros(1,8) 1 0
+                            zeros(1,8) 0 1 ];
         tcontrast_1_vector = [-1 1];
         tcontrast_2_vector = [1 -1];        
     case 4 % New_correct, New_incorrect, Old_correct, Old_incorrect
-        fcontrast_vector = [1 0 0 0 
-                            0 1 0 0 
-                            0 0 1 0 
-                            0 0 0 1 ];
+        fcontrast_vector = [1 0 0 0 zeros(1,10)
+                            0 1 0 0 zeros(1,10)
+                            0 0 1 0 zeros(1,10)
+                            0 0 0 1 zeros(1,10)
+                            zeros(1,10) 1 0 0 0
+                            zeros(1,10) 0 1 0 0
+                            zeros(1,10) 0 0 1 0
+                            zeros(1,10) 0 0 0 1 ];
         tcontrast_1_vector = [-1 0  1 0];
         tcontrast_2_vector = [ 1 0 -1 0];
     case 5 % New_correct, New_incorrect, Old_correct, Old_incorrect, Misses
-        fcontrast_vector = [1 0 0 0
-                            0 1 0 0 
-                            0 0 1 0 
-                            0 0 0 1 ];
+        fcontrast_vector = [1 0 0 0 zeros(1,11)
+                            0 1 0 0 zeros(1,11)
+                            0 0 1 0 zeros(1,11)
+                            0 0 0 1 zeros(1,11)
+                            zeros(1,11) 1 0 0 0
+                            zeros(1,11) 0 1 0 0
+                            zeros(1,11) 0 0 1 0
+                            zeros(1,11) 0 0 0 1];
         tcontrast_1_vector = [-1 0  1 0];
         tcontrast_2_vector = [ 1 0 -1 0];
     otherwise

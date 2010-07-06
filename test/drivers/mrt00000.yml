@@ -37,7 +37,7 @@ jobs:
       - 164
       
   - step: stats
-    method: Merit220Stats
+    method: JohnsonMerit220Visit1Stats
     responses:
       directory: rpipe/spec/fixtures/rawdata/responses
       logfiles: 

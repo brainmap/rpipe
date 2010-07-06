@@ -29,7 +29,7 @@ describe "Integration Processing for Johnson.Tbi.Longitudinal.Snod" do
   #   @origdir = @driver['origdir']
   #   Dir.compare_directories(@origdir, @completed_orig_directory)
   # end
-   
+  #  
   # it "should preprocess raw data" do
   #   @driver['origdir']  = @origdir || @completed_orig_directory
   #   pipe = RPipe.new(@driver)
@@ -38,14 +38,14 @@ describe "Integration Processing for Johnson.Tbi.Longitudinal.Snod" do
   #   @procdir = @driver['procdir']
   #   Dir.compare_directories(@procdir, @completed_proc_directory)    
   # end
-  # 
+  
   it "should run stats on processed data" do
     @driver['procdir'] = @procdir || @completed_proc_directory
     pipe = RPipe.new(@driver)
     s = pipe.stats_jobs.first
     s.perform
     @statsdir = @driver['statsdir']
-    # Dir.compare_directories(@statsdir, @completed_stats_directory)
+    Dir.compare_directories(@statsdir, @completed_stats_directory)
   end
 
 end
