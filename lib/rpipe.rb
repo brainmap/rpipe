@@ -23,14 +23,17 @@ class JobStep
 	# Intialize with two configuration option hashes - workflow_spec and job_spec
 	def initialize(workflow_spec, job_spec)
 		# allow jobspec to override the workflow spec
-		@subid    = job_spec['subid']     || workflow_spec['subid']
-		@rawdir   = job_spec['rawdir']    || workflow_spec['rawdir']
-		@origdir  = job_spec['origdir']   || workflow_spec['origdir']
-		@procdir  = job_spec['procdir']   || workflow_spec['procdir']
-		@statsdir = job_spec['statsdir']  || workflow_spec['statsdir']
-		@spmdir   = job_spec['spmdir']    || workflow_spec['spmdir']
+		@subid        = job_spec['subid']       || workflow_spec['subid']
+		@rawdir       = job_spec['rawdir']      || workflow_spec['rawdir']
+		@origdir      = job_spec['origdir']     || workflow_spec['origdir']
+		@procdir      = job_spec['procdir']     || workflow_spec['procdir']
+		@statsdir     = job_spec['statsdir']    || workflow_spec['statsdir']
+		@spmdir       = job_spec['spmdir']      || workflow_spec['spmdir']
+		@scans        = job_spec['scans']       || workflow_spec['scans']
+		@scan_labels  = job_spec['scan_labels'] || workflow_spec['scan_labels'] 
 		@collision_policy = (job_spec['collision'] || workflow_spec['collision'] || COLLISION_POLICY).to_sym
-		include_custom_methods(job_spec['method'])
+		@method = job_spec['method']
+		include_custom_methods(@method)
 		@root_dir = File.dirname(Pathname.new(__FILE__).realpath)
 		
 		job_requires 'subid'
@@ -121,7 +124,6 @@ class Reconstruction < JobStep
 	# reconstruction tasks.	 This hash is normally generated with a Pipe object.
 	def initialize(workflow_spec, recon_spec)
 		super(workflow_spec, recon_spec)
-		@scans = recon_spec['scans']
 		raise ScriptError, "At least one scan must be specified." if @scans.nil?
 		@volume_skip = recon_spec['volume_skip'] || VOLUME_SKIP
 		

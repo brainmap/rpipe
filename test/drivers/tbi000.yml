@@ -2,7 +2,7 @@
 subid: tbi000
 origdir:  <%= Dir.mktmpdir('orig') %>
 procdir:  <%= Dir.mktmpdir('proc') %>
-statsdir: <%= Dir.mktmpdir('stats') %>
+statsdir: <%= @statsdir = Dir.mktmpdir('stats') %>
 study_procedure: johnson.tbi.longitudinal.snod
 task_onsets: /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/snod_onsets.yml
 collision: overwrite
@@ -56,35 +56,80 @@ jobs:
         
 - step: preprocess
   method: JohnsonTbiLongitudinalSnodPreproc
+  scan_labels:
+    - v1_snodB
+    - v1_snodA
   bold_reps:
     - 138
     - 138
+- step: preprocess
+  method: JohnsonTbiLongitudinalSnodPreproc
+  scan_labels:
+    - v2_snodC
+    - v2_snodD
+  bold_reps:
     - 138
     - 138
+- step: preprocess
+  method: JohnsonTbiLongitudinalSnodPreproc
+  scan_labels:
+    - v3_snodB
+    - v3_snodA
+  bold_reps:
     - 138
     - 138
 
 - step: stats
+  statsdir: <%= File.join(@statsdir, 'v1') %>
   method: JohnsonTbiLongitudinalSnodStats
+  scan_labels:
+    - v1_snodB
+    - v1_snodA
   onsetsfiles:
   - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodB_vectors.mat
   - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodA_vectors.mat
-  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodC_vectors.mat
-  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodD_vectors.mat
-  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodB_vectors.mat
-  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodA_vectors.mat  
   regressorsfiles: 
   - rp_atbi000_v1_snodB.txt
   - rp_atbi000_v1_snodA.txt
-  - rp_atbi000_v2_snodC.txt
-  - rp_atbi000_v2_snodD.txt
-  - rp_atbi000_v3_snodB.txt
-  - rp_atbi000_v3_snodA.txt
   bold_reps:
     - 138
     - 138
+  conditions:
+    - new
+    - old
+
+- step: stats
+  statsdir: <%= File.join(@statsdir, 'v2') %>
+  method: JohnsonTbiLongitudinalSnodStats
+  scan_labels:
+    - v2_snodC
+    - v2_snodD
+  onsetsfiles:
+  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodC_vectors.mat
+  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodD_vectors.mat
+  regressorsfiles: 
+  - rp_atbi000_v2_snodC.txt
+  - rp_atbi000_v2_snodD.txt
+  bold_reps:
     - 138
     - 138
+  conditions:
+    - new
+    - old
+
+- step: stats
+  statsdir: <%= File.join(@statsdir, 'v3') %>
+  method: JohnsonTbiLongitudinalSnodStats
+  scan_labels:
+    - v3_snodB
+    - v3_snodA
+  onsetsfiles:
+  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodB_vectors.mat
+  - /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/onsets/snodA_vectors.mat  
+  regressorsfiles: 
+  - rp_atbi000_v3_snodB.txt
+  - rp_atbi000_v3_snodA.txt
+  bold_reps:
     - 138
     - 138
   conditions:

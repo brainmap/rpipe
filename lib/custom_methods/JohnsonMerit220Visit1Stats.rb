@@ -1,5 +1,5 @@
 require 'logfile'
-module Merit220Stats
+module JohnsonMerit220Visit1Stats
 
 	DEFAULT_CONDITIONS = [:new_correct_, :new_incorrect_, :old_correct_, :old_incorrect, {:misses => [:new_misses, :old_misses]} ]
   
@@ -48,12 +48,12 @@ module Merit220Stats
       File.join(@root_dir, 'custom_methods'), 
       File.join(@root_dir, 'matlab_helpers')    ]
 
-	  queue << "Merit220Stats('#{@statsdir}/', \
-    { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \
+	  queue << "#{@method}('#{@statsdir}/', \
+    { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} }, \
     { #{@bold_reps.join(' ') } }, \
     { #{@onsetsfiles.collect { |file| "'#{File.basename(file)}'"}.join(' ') } }, \
     { #{@regressorsfiles.collect { |file| "'#{File.basename(file)}'"}.join(' ') } }, \
-    'Merit220Stats_job.m')"
+    '#{@method}_job.m')"
     
     # puts queue.to_s
     queue.run!

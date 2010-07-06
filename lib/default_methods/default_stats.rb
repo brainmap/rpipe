@@ -18,7 +18,11 @@ module DefaultStats
 	
 	# Links all the files necessary from the "proc" directory. Links written to current working directory.
 	def link_files_from_proc_directory(images_wildcard = File.join(@procdir, "swq*.nii"), motion_regressors_wildcard = File.join(@procdir, "md_rp*.txt"))
+		puts Dir.glob(images_wildcard), @statsdir
+		raise IOError, "No images to link with #{images_wildcard}" if Dir.glob(images_wildcard).empty?
 		system("ln -s #{images_wildcard} #{@statsdir}")
+
+		raise IOError, "No motion_regressors to link with #{motion_regressors_wildcard}" if Dir.glob(motion_regressors_wildcard).empty?
 		system("ln -s #{motion_regressors_wildcard} #{@statsdir}")
 	end
 	
@@ -61,7 +65,9 @@ module DefaultStats
 	  onsets_csv_files = []
 	  onsets_mat_files = []
 	  wd = Dir.pwd
-	  Dir.chdir responses['directory'] do
+	  matching_directories = Dir.glob(responses['directory'])
+	  raise IOError, "Only one response directory currently accepted (matched directories: #{matching_directories.join(', ')})" unless matching_directories.length == 1
+	  Dir.chdir matching_directories.first  do
 	    responses['logfiles'].each do |logfile|
   	    # Either Strip off the prefix directly without changing the name...
         #   prefix = File.basename(logfile, '.txt')

@@ -19,7 +19,8 @@ module JohnsonTbiLongitudinalSnodPreproc
 	private
 	
 	def run_preproc_mfile
-	  images = Dir.glob(File.join(@origdir, "a*#{@subid}*.nii"))
+	  images = @scan_labels ? @scan_labels.collect! { |label| Dir.glob("a*#{label}*.nii").to_s } : Dir.glob(File.join(@origdir, "a*#{@subid}*.nii"))
+	  
 	  raise ScriptError, "Can't find any slice-time corrected images in #{@origdir}" if images.empty?
 	  queue = MatlabQueue.new
 	  queue.paths << ['/Applications/spm/spm8/spm8_current', 

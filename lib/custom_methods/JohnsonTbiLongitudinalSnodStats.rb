@@ -40,12 +40,11 @@ module JohnsonTbiLongitudinalSnodStats
   
   # Finally runs the stats job 
   def run_stats_spm_job
-    images = Dir.glob(File.join(@statsdir, "sw*#{@subid}*.nii"))
+    images = @scan_labels ? @scan_labels.collect! { |label| Dir.glob("sw*#{label}*.nii").to_s } : Dir.glob(File.join(@origdir, "sw*#{@subid}*.nii"))
     raise ScriptError, "Can't find any smoothed, warped images in #{@statsdir}" if images.empty?
     unless @onsetsfiles.length == @regressorsfiles.length && @regressorsfiles.length == @bold_reps.length
       raise ScriptError, "Mismatch between #{@bold_reps.length} reps, #{@onsetsfiles.length} onsets and #{@regressorsfiles.length} regressors files."
     end
-    
     
     queue = MatlabQueue.new
 	  queue.paths << ['/Applications/spm/spm8/spm8_current', 
