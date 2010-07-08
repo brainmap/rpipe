@@ -2,7 +2,7 @@
 subid: tbi000
 origdir:  <%= Dir.mktmpdir('orig') %>
 procdir:  <%= Dir.mktmpdir('proc') %>
-statsdir: <%= @statsdir = Dir.mktmpdir('stats') %>
+statsdir: <%= @statsdir = Dir.mktmpdir('stats_separate') %>
 study_procedure: johnson.tbi.longitudinal.snod
 # task_onsets: /Data/vtrak1/analyses/aparna/tbifmrilongitudinal/johnson.tbi.longitudinal.snod/progs/snod_onsets.yml
 collision: overwrite
@@ -56,20 +56,28 @@ jobs:
         
 - step: preprocess
   method: JohnsonTbiLongitudinalSnodPreproc
-  scan_labels:
-    - v1_snodB
-    - v1_snodA
-    - v2_snodC
-    - v2_snodD
-    - v3_snodB
-    - v3_snodA
   bold_reps:
     - 138
     - 138
+  scan_labels:
+    - v1_snodB
+    - v1_snodA
+- step: preprocess
+  method: JohnsonTbiLongitudinalSnodPreproc
+  bold_reps:
     - 138
     - 138
+  scan_labels:
+    - v2_snodC
+    - v2_snodD
+- step: preprocess
+  method: JohnsonTbiLongitudinalSnodPreproc
+  bold_reps:
     - 138
     - 138
+  scan_labels:
+    - v3_snodB
+    - v3_snodA
 
 - step: stats
   statsdir: <%= File.join(@statsdir, 'v1') %>

@@ -38,9 +38,10 @@ module DefaultRecon
 	
 	alias_method :perform, :recon_visit
 	
-	# Reconstructs a scan from dicoms to nifti, anatomical or functional.	 Uses a scan_spec hash to drive.
-	# Writes the result in current working directory. Raises an error if to3d system call fails.
-	# Conventions: I****.dcm filenaming, I0002.dcm is second file in series, 
+  # Reconstructs a scan from dicoms or pfile to nifti, anatomical or functional.
+  # Uses a scan_spec hash to drive. Writes the result in current working
+  # directory. Raises an error if to3d system call fails. Conventions: I****.dcm
+  # filenaming, I0002.dcm is second file in series,
 	def reconstruct_scan(scan_spec, outfile)	
 		if scan_spec['dir']
 		  reconstruct_dicom_sequence(scan_spec, 'tmp.nii')
@@ -165,14 +166,13 @@ module DefaultRecon
 
   		timing_opts = timing_options(scan_spec, second_file)
 		
-  		unless system(recon_cmd_format % [timing_opts, wildcard])
+  		unless run(recon_cmd_format % [timing_opts, wildcard])
   			raise(IOError,"Failed to reconstruct scan: #{scandir}")
   		end
 		end
   end
   
   def reconstruct_pfile_sequence(scan_spec, outfile)
-    puts outfile
     base_pfile_path = File.join(@rawdir, scan_spec['pfile'])
     pfile_path = File.exist?(base_pfile_path) ? base_pfile_path : base_pfile_path + '.bz2'
     
@@ -180,21 +180,26 @@ module DefaultRecon
       
 		flash "Pfile Reconstruction: #{pfile_path}"
 		Pathname.new(pfile_path).local_copy do |pfile|
-		  reconstruct_pfile(pfile, outfile, scan_spec['volumes_to_skip'])
+		  reconstruct_pfile(pfile, outfile, scan_spec['volumes_to_skip'], scan_spec['refdat_stem'] || false)
 	  end    
   end
   
   # Reconstructs a single pfile into the epirecon default brik/head when
   # given a temporary working directory, path to the pfile and the task to
   # use when naming the output.
-  def reconstruct_pfile(pfile, label, volumes_to_skip = 3, refdat_stem = 'ref.dat')
-		setup_refdat(refdat_stem)
+  def reconstruct_pfile(pfile, label, volumes_to_skip = 3, refdat_stem = false)
+		refdat_file = refdat_stem ? refdat_stem : search_for_refdat_file
+		setup_refdat(refdat_file)
     epirecon_cmd_format = "epirecon_ex -f %s -NAME %s -skip %d -scltype=0"
 		epirecon_cmd = epirecon_cmd_format % [pfile, label, volumes_to_skip]
-		puts epirecon_cmd
-		puts output = `#{epirecon_cmd}`
-		puts Dir.pwd
-		puts Dir.glob('*')
+		raise ScriptError, "Problem running #{epirecon_cmd}" unless run(epirecon_cmd)
+  end
+  
+  def search_for_refdat_file
+    Dir.new(@rawdir).each do |file|
+      return file if file =~ /ref.dat/
+    end
+    raise ScriptError, "No candidate ref.dat file found in #{@rawdir}"
   end
   
   def setup_refdat(refdat_stem)

@@ -1,10 +1,16 @@
+%-----------------------------------------------------------------------------
+% Unfortunately, there is no easy way to pass in the number of images to this
+% template job, short of writing a function to build one on the fly. Number of
+% sessions is hardcoded.
+nsessions = 2;
+%-----------------------------------------------------------------------------
+
 %-----------------------------------------------------------------------
 % Job configuration created by cfg_util (rev $Rev: 3599 $)
 %-----------------------------------------------------------------------
-matlabbatch{1}.spm.spatial.realign.estimate.data = {
-                                                    '<UNDEFINED>'
-                                                    '<UNDEFINED>'
-                                                    }';
+for i = 1:nsessions
+	matlabbatch{1}.spm.spatial.realign.estimate.data{i} = '<UNDEFINED>';
+end
 matlabbatch{1}.spm.spatial.realign.estimate.eoptions.quality = 0.9;
 matlabbatch{1}.spm.spatial.realign.estimate.eoptions.sep = 4;
 matlabbatch{1}.spm.spatial.realign.estimate.eoptions.fwhm = 5;
@@ -22,24 +28,17 @@ matlabbatch{2}.spm.spatial.normalise.estwrite.subj.source(1).sname = 'Realign: E
 matlabbatch{2}.spm.spatial.normalise.estwrite.subj.source(1).src_exbranch = substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1});
 matlabbatch{2}.spm.spatial.normalise.estwrite.subj.source(1).src_output = substruct('.','sess', '()',{1}, '.','cfiles');
 matlabbatch{2}.spm.spatial.normalise.estwrite.subj.wtsrc = '';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(1) = cfg_dep;
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(1).tname = 'Images to Write';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(1).tgt_spec{1}(1).name = 'filter';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(1).tgt_spec{1}(1).value = 'image';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(1).tgt_spec{1}(2).name = 'strtype';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(1).tgt_spec{1}(2).value = 'e';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(1).sname = 'Realign: Estimate: Realigned Images (Sess 1)';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(1).src_exbranch = substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1});
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(1).src_output = substruct('.','sess', '()',{1}, '.','cfiles');
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(2) = cfg_dep;
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(2).tname = 'Images to Write';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(2).tgt_spec{1}(1).name = 'filter';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(2).tgt_spec{1}(1).value = 'image';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(2).tgt_spec{1}(2).name = 'strtype';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(2).tgt_spec{1}(2).value = 'e';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(2).sname = 'Realign: Estimate: Realigned Images (Sess 2)';
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(2).src_exbranch = substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1});
-matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(2).src_output = substruct('.','sess', '()',{2}, '.','cfiles');
+for i = 1:nsessions
+	matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(i) = cfg_dep;
+	matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(i).tname = 'Images to Write';
+	matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(i).tgt_spec{1}(1).name = 'filter';
+	matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(i).tgt_spec{1}(1).value = 'image';
+	matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(i).tgt_spec{1}(2).name = 'strtype';
+	matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(i).tgt_spec{1}(2).value = 'e';
+	matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(i).sname = ['Realign: Estimate: Realigned Images (Sess' i ')'];
+	matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(i).src_exbranch = substruct('.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1}, '.','val', '{}',{1});
+	matlabbatch{2}.spm.spatial.normalise.estwrite.subj.resample(i).src_output = substruct('.','sess', '()',{i}, '.','cfiles');
+end
 matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.template = {[spm('Dir') '/templates/EPI.nii,1']};
 matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.weight = '';
 matlabbatch{2}.spm.spatial.normalise.estwrite.eoptions.smosrc = 8;

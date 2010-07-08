@@ -29,9 +29,11 @@ describe "Integration Processing for Johnson.Tbi.Longitudinal.Snod" do
   #   @origdir = @driver['origdir']
   #   Dir.compare_directories(@origdir, @completed_orig_directory)
   # end
-  #  
-  # it "should preprocess raw data" do
-  #   @driver['origdir']  = @origdir || @completed_orig_directory
+   
+  # it "should preprocess reconstructed data" do
+  #   # Realignment alters the headers of images during Estimate, so you must
+  #   # use a local copy that hasn't been run before for correct results.
+  #   @driver['origdir']  = @origdir || Pathname.new(@completed_orig_directory).recursive_local_copy
   #   pipe = RPipe.new(@driver)
   #   p = pipe.preproc_jobs.first
   #   p.perform

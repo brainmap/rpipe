@@ -8,6 +8,7 @@ require 'fileutils'
 require 'pathname'
 require 'tmpdir'
 require 'erb'
+require 'log4r'
 require 'core_additions'
 require 'metamri/core_additions'
 
@@ -57,6 +58,7 @@ class JobStep
 		printf "\t%s\n", Time.now
 		puts "+" * 120
 		puts
+		$Log.info msg
 	end
 	
 	# Setup directory path according to collision policy.
@@ -103,6 +105,14 @@ class JobStep
       yield undefined_vars
     end
   end
+  
+  # Run and Log and command to the system.
+  def run(command)
+    $CommandLog.info command
+    $Log.info `command`
+    $Log.outputters.each {|outputter| outputter.flush }
+    return false unless $?.exitstatus == 0
+  end
   	
 end
 
@@ -111,7 +121,7 @@ end
 ########################################################################################################################
 # A class for performing initial reconstruction of both functional and anatomical MRI scan acquisitions.
 # Uses AFNI to convert from dicoms to 3D or 4D nifti files, initial volume stripping, and slice timing correction.
-# Currently, only dicom raw data is supported, and only supports the I****.dcm file naming convention.
+# Currently, supports dicoms or P-Files.
 class Reconstruction < JobStep
 	require 'default_methods/default_recon'
 	include DefaultRecon
@@ -200,6 +210,8 @@ end
 # class are available to run segments of preprocessing.
 class RPipe
 	
+	include Log4r
+	
 	attr_accessor :recon_jobs, :preproc_jobs, :stats_jobs, :workflow_spec
 	
 	ROOT_DIR = File.expand_path(File.dirname(__FILE__))
@@ -212,23 +224,18 @@ class RPipe
 	#
 	# The driver may be either a Hash or a yaml configuration file.
 	
-	def initialize(driver)
-		
+	def initialize(driver)	
 		@recon_jobs = []
 		@preproc_jobs = []
 		@stats_jobs = []
 		
 		# A driver may be either a properly configured hash or a Yaml file containing
 		# the configuration.  
-		if driver.class == Hash
-		  @workflow_spec = driver
-	  else
-	    @workflow_spec = read_driver_file(driver)
-    end
-  		
+		@workflow_spec = driver.kind_of?(Hash) ? driver : read_driver_file(driver)
 		
+    setup_logger
+    
     jobs = @workflow_spec['jobs']
-		
 		jobs.each do |job_params|
 			@recon_jobs   << Reconstruction.new(@workflow_spec, job_params) if job_params['step'] == 'reconstruct'
 			@preproc_jobs << Preprocessing.new(@workflow_spec, job_params)  if job_params['step'] == 'preprocess'
@@ -253,6 +260,15 @@ class RPipe
   # To compare jobs look at their configuration, not ruby object identity.
   def ==(other_rpipe)
     @workflow_spec == other_rpipe.workflow_spec
+  end
+  
+  def setup_logger
+    $Log = Logger.new('output')
+    $Log.add StdoutOutputter.new(:stdout, :formatter => PatternFormatter.new(:pattern => "++++\n%m"))
+
+    $CommandLog = Logger.new('command::output')
+    $CommandLog.add FileOutputter.new(:file, :filename => @workflow_spec['subid'], :formatter => PatternFormatter.new(:pattern => "%m"))
+    $CommandLog.add StdoutOutputter.new(:stdout, :formatter => PatternFormatter.new(:pattern => "++++\n%m"))
   end
 	
 end

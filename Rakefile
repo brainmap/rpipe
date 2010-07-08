@@ -12,6 +12,7 @@ begin
     gem.authors = ["Kristopher Kosmatka", "Erik Kastman"]
     gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
     gem.add_dependency "metamri"
+    gem.add_dependency "log4r"
     gem.add_dependency "ruport"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
