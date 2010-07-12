@@ -1,3 +1,5 @@
+load '~/code/metamri/lib/metamri/core_additions.rb'
+
 module DefaultPreproc
 	
 	# Runs the preprocessing job, including spm job customization, run spm job, and handling motion issues.
@@ -22,7 +24,12 @@ module DefaultPreproc
 	def link_files_into_proc
 		flash "Linking files from #{@origdir} into #{@procdir}"
 		wildcard = File.join(@origdir,"a*#{@subid}*.nii")
-		system("ln -s #{wildcard} #{@procdir}")
+		files = Dir.glob(wildcard)
+		unless files.empty?
+		  system("ln -s #{wildcard} #{@procdir}")
+	  else
+	    raise(IOError, "No files matching #{wildcard} found.")
+    end
 	end
 	
 	# Customizes the template job in preproc_spec to be specific for this particular preproc job.
@@ -57,8 +64,8 @@ module DefaultPreproc
 	def deal_with_motion
 		flash "Calculating motion derivatives and checking for excessive motion"
 		Dir.glob("rp_a*txt").each do |rp|
-			system("calc_derivs.sh #{rp}")
-			system("fmri_motion_check.sh #{rp} #{@motion_threshold}")
+			run("calc_derivs.sh #{rp}")
+			run("fmri_motion_check.sh #{rp} #{@motion_threshold}")
 		end
 	end
 	

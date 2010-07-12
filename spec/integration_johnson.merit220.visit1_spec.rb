@@ -20,22 +20,22 @@ describe "Integration Processing for Johnson.Merit220" do
     
   end
   
-  it "should reconstruct raw data" do
-    pipe = RPipe.new(@driver)
-    p = pipe.recon_jobs.first
-    p.perform
-    @origdir = @driver['origdir']
-    Dir.compare_directories(@origdir, @completed_orig_directory)
-  end
-  #  
-  # it "should preprocess raw data" do
-  #   @driver['origdir']  = @origdir || @completed_orig_directory
+  # it "should reconstruct raw data" do
   #   pipe = RPipe.new(@driver)
-  #   p = pipe.preproc_jobs.first
+  #   p = pipe.recon_jobs.first
   #   p.perform
-  #   @procdir = @driver['procdir']
-  #   Dir.compare_directories(@procdir, @completed_proc_directory)    
+  #   @origdir = @driver['origdir']
+  #   Dir.compare_directories(@origdir, @completed_orig_directory)
   # end
+  #  
+  it "should preprocess raw data" do
+    @driver['origdir']  = @origdir || @completed_orig_directory
+    pipe = RPipe.new(@driver)
+    p = pipe.preproc_jobs.first
+    p.perform
+    @procdir = @driver['procdir']
+    Dir.compare_directories(@procdir, @completed_proc_directory)    
+  end
   
   # it "should run stats on processed data" do
   #   @driver['procdir'] = @procdir || @completed_proc_directory

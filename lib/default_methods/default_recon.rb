@@ -70,7 +70,7 @@ module DefaultRecon
 	def strip_leading_volumes(infile, outfile, volume_skip, bold_reps)
 		flash "Stripping #{volume_skip.to_s} leading volumes: #{infile}"
 		puts cmd = "fslroi #{infile} #{outfile} #{volume_skip.to_s} #{bold_reps.to_s}"
-		unless system(cmd)
+		unless run(cmd)
 		  raise ScriptError, "Failed to strip volumes: #{cmd}"
 	  end
 	end
@@ -79,7 +79,7 @@ module DefaultRecon
 	def slice_time_correct(infile)
 		flash "Slice Timing Correction: #{infile}"
 		cmd = "3dTshift -tzero 0 -tpattern alt+z -prefix a#{infile} #{infile}"
-		unless system(cmd)
+		unless run(cmd)
 		  raise ScriptError, "Failed to slice time correct: #{cmd}"
 	  end
 	end
@@ -111,7 +111,7 @@ module DefaultRecon
 	def run_retroicor(physio_files, file)
 	  icor_cmd, outfile = build_retroicor_cmd(physio_files, file)
 	  flash "3dRetroicor: #{file} \n #{icor_cmd}"
-	  if system(icor_cmd)
+	  if run(icor_cmd)
 	    return outfile
     else
       raise ScriptError, "Problem running #{icor_cmd}"

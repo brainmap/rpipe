@@ -26,10 +26,8 @@ eval(['load ' conditions{1}]);
 
 switch numel(names)
     case 2 % New, Old
-        fcontrast_vector = [1 0 zeros(1,8)
-                            0 1 zeros(1,8)
-                            zeros(1, 8) 1 0 
-                            zeros(1, 8) 0 1 ];
+        fcontrast_vector = [1 0
+        										0 1];
         tcontrast_1_vector = [-1 1];
         tcontrast_2_vector = [1 -1];
     % case 4 % New_correct, New_incorrect, Old_correct, Old_incorrect
@@ -59,13 +57,17 @@ for crun = 1:nrun
 			inputs{offset + 2, crun}  = CreateFunctionalVolumeStruct(statsdir, images{index}, image_boldreps{index}); % fMRI model specification: Scans - cfg_entry
 			inputs{offset + 3, crun}  = { strcat(statsdir, conditions{index} ) };    % fMRI model specification: Multiple Conditions File - cfg_entry
 			inputs{offset + 4, crun}  = { strcat(statsdir, regressors{index} ) };    % fMRI model specification: Multiple Regressors File - cfg_entry
-			inputs{offset + 5, crun}  = 'Omnibus F';    % fMRI model specification: Omnibus Title - cfg_entry
-      inputs{offset + 6, crun}  = fcontrast_vector;    % fMRI model specification: Omnibus Contrast - cfg_entry
-			inputs{offset + 7, crun}  = 'PV > NV';   % fMRI model specification: T Contrast 1 Title - cfg_entry
-			inputs{offset + 8, crun}  = tcontrast_1_vector; % fMRI model specification: T Contrast 1 Vector - cfg_entry
-			inputs{offset + 9, crun}  = 'NV > PV';   % fMRI model specification: T Contrast 2 Title - cfg_entry
-			inputs{offset + 10, crun} = tcontrast_2_vector; % fMRI model specification: T Contrast 2 Vector - cfg_entry
 		end
+
+		image_offset = (length(images) .* 3) + 1;
+		inputs{image_offset + 1, crun}  = 'Omnibus F';				% fMRI model specification: Omnibus Title - cfg_entry
+    inputs{image_offset + 2, crun}  = fcontrast_vector;		% fMRI model specification: Omnibus Contrast - cfg_entry
+
+		inputs{image_offset + 3, crun}  = 'NV > PV';					% fMRI model specification: T Contrast 1 Title - cfg_entry
+		inputs{image_offset + 4, crun}  = tcontrast_1_vector; % fMRI model specification: T Contrast 1 Vector - cfg_entry
+
+		inputs{image_offset + 5, crun}  = 'PV > NV';   				% fMRI model specification: T Contrast 2 Title - cfg_entry
+		inputs{image_offset + 6, crun} = tcontrast_2_vector; 	% fMRI model specification: T Contrast 2 Vector - cfg_entry
 
 end
 

@@ -2,7 +2,7 @@
 % Unfortunately, there is no easy way to pass in the number of images to this
 % template job, short of writing a function to build one on the fly. Number of
 % sessions is hardcoded.
-nsessions = 2;
+nsessions = 6;
 %-----------------------------------------------------------------------------
 
 %-----------------------------------------------------------------------

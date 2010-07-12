@@ -9,6 +9,7 @@ require 'pathname'
 require 'tmpdir'
 require 'erb'
 require 'log4r'
+require 'popen4'
 require 'core_additions'
 require 'metamri/core_additions'
 
@@ -109,9 +110,12 @@ class JobStep
   # Run and Log and command to the system.
   def run(command)
     $CommandLog.info command
-    $Log.info `command`
-    $Log.outputters.each {|outputter| outputter.flush }
-    return false unless $?.exitstatus == 0
+    
+    status = POpen4::popen4(command) do |stdout, stderr|
+      puts $Log.info stdout.read.strip
+    end
+        
+    status.exitstatus == 0 ? true : false
   end
   	
 end
@@ -263,12 +267,15 @@ class RPipe
   end
   
   def setup_logger
+    console_pattern = "#{"+" * 120}\n\t%m\n\t%d\n#{"+" * 120}\n"
     $Log = Logger.new('output')
-    $Log.add StdoutOutputter.new(:stdout, :formatter => PatternFormatter.new(:pattern => "++++\n%m"))
+    $Log.add StdoutOutputter.new(:stdout, :formatter => PatternFormatter.new(:pattern => console_pattern))
 
+    command_log = @workflow_spec['subid'] + '.log'
+    File.delete command_log if File.exist? command_log
     $CommandLog = Logger.new('command::output')
-    $CommandLog.add FileOutputter.new(:file, :filename => @workflow_spec['subid'], :formatter => PatternFormatter.new(:pattern => "%m"))
-    $CommandLog.add StdoutOutputter.new(:stdout, :formatter => PatternFormatter.new(:pattern => "++++\n%m"))
+    $CommandLog.add FileOutputter.new(:file, :filename => command_log, :formatter => PatternFormatter.new(:pattern => "%m"))
+    $CommandLog.add StdoutOutputter.new(:stdout, :formatter => PatternFormatter.new(:pattern => console_pattern))
   end
 	
 end
