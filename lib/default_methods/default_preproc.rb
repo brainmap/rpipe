@@ -1,5 +1,3 @@
-load '~/code/metamri/lib/metamri/core_additions.rb'
-
 module DefaultPreproc
 	
 	# Runs the preprocessing job, including spm job customization, run spm job, and handling motion issues.

@@ -2,8 +2,9 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', '..', '..',  'physion
 
 require 'metamri/core_additions'
 require 'physionoise'
-
 require 'pathname'
+require 'default_methods/recon/physionoise_helper'
+require 'default_methods/recon/raw_sequence'
 
 module DefaultRecon
 	
@@ -44,33 +45,25 @@ module DefaultRecon
   # filenaming, I0002.dcm is second file in series,
 	def reconstruct_scan(scan_spec, outfile)	
 		if scan_spec['dir']
-		  reconstruct_dicom_sequence(scan_spec, 'tmp.nii')
+		  sequence = DicomRawSequence.new(scan_spec, @rawdir)
+		  sequence.prepare('tmp.nii')
 			strip_leading_volumes('tmp.nii', outfile, @volume_skip, scan_spec['bold_reps'])
 	  elsif scan_spec['pfile']
-	    reconstruct_pfile_sequence(scan_spec, outfile)
-    else raise ConfigError, "Scan must list either a pfile or a dicom directory."
+	    sequence = PfileRawSequence.new(scan_spec, @rawdir)
+	    sequence.prepare(outfile)
+    else 
+      raise ConfigError, "Scan must list either a pfile or a dicom directory."
     end
-	end
-	
-	# Determines the proper timing options to pass to to3d for functional scans.	Must pass a static path to
-	# the second file in the series to determine zt vs tz ordering.	 Assumes 2sec TR's.	 Returns the options
-	# as a string that may be empty if the scan is an anatomical.
-	def timing_options(scan_spec, second_file)
-		return "" if scan_spec['type'] == "anat"
-		instance_offset = scan_spec['z_slices'] + 1
-		if system("dicom_hdr #{second_file} | grep .*REL.Instance.*#{instance_offset}")
-			return "-epan -time:tz #{scan_spec['bold_reps']} #{scan_spec['z_slices']} 2000 alt+z"
-		else
-			return "-epan -time:zt #{scan_spec['z_slices']} #{scan_spec['bold_reps']} 2000 alt+z"
-		end
 	end
 	
 	# Removes the specified number of volumes from the beginning of a 4D functional nifti file.
 	# In most cases this will be 3 volumes. Writes result in current working directory.
 	def strip_leading_volumes(infile, outfile, volume_skip, bold_reps)
 		$Log.info "Stripping #{volume_skip.to_s} leading volumes: #{infile}"
-		cmd_fmt = "fslroi %s %s %s %s" 
-		unless run(cmd_fmt % [infile, outfile, volume_skip.to_s, bold_reps.to_s])
+		cmd_fmt = "fslroi %s %s %s %s"
+		cmd_options = [infile, outfile, volume_skip.to_s, bold_reps.to_s]
+		cmd = cmd_fmt % cmd_options
+		unless run(cmd)
 		  raise ScriptError, "Failed to strip volumes: #{cmd}"
 	  end
 	end
@@ -83,132 +76,5 @@ module DefaultRecon
 		  raise ScriptError, "Failed to slice time correct: #{cmd}"
 	  end
 	end
-	
-	def generate_physiospec
-	  physiospec = Physiospec.new(@rawdir, File.join(@rawdir, '..', 'cardiac'))
-	  physiospec.epis_and_associated_phys_files
-  end
-	
-	def create_physiosnoise_regressors(scan_spec)
-    runs = build_physionoise_run_spec(scan_spec)
-    Physionoise.run_physionoise_on(runs, ["--saveFiles"])
-  end
-  
-  def build_physionoise_run_spec(rpipe_scan_spec)
-    run = rpipe_scan_spec['physio_files'].dup
-    flash "Physionoise Regressors: #{run[:phys_directory]}"
-    run[:bold_reps] = rpipe_scan_spec['bold_reps']
-    run[:rep_time] = rpipe_scan_spec['rep_time']
-    unless Pathname.new(run[:phys_directory]).absolute?
-      run[:phys_directory] = File.join(@rawdir, run[:phys_directory])
-    end
-    run[:run_directory] = @rawdir
-    runs = [run]
-  end
-	
-	# Runs 3dRetroicor for a scan.
-	# Returns the output filename if successful or raises an error if there was an error.
-	def run_retroicor(physio_files, file)
-	  icor_cmd, outfile = build_retroicor_cmd(physio_files, file)
-	  flash "3dRetroicor: #{file} \n #{icor_cmd}"
-	  if run(icor_cmd)
-	    return outfile
-    else
-      raise ScriptError, "Problem running #{icor_cmd}"
-    end
-  end
-	
-	# Builds a properly formed 3dRetroicor command and returns the command and 
-	# output filename.
-	#
-	# Input a physio_files hash with keys:
-	#   :respiration_signal: RESPData_epiRT_0303201014_46_27_463
-  #   :respiration_trigger: RESPTrig_epiRT_0303201014_46_27_463
-  #   :phys_directory: cardiac/
-  #   :cardiac_signal: PPGData_epiRT_0303201014_46_27_463
-  #   :cardiac_trigger: PPGTrig_epiRT_0303201014_46_27_463
-	def build_retroicor_cmd(physio_files, file)
-    [:cardiac_signal, :respiration_signal].collect {|req| raise ScriptError, "Missing physio config: #{req}" unless physio_files.include?(req)}
-    
-    prefix = 'p'
-    unless Pathname.new(physio_files[:cardiac_signal]).absolute?
-      cardiac_signal = File.join(@rawdir, physio_files[:phys_directory], physio_files[:cardiac_signal])
-    end
-    
-    unless Pathname.new(physio_files[:respiration_signal]).absolute?
-      respiration_signal = File.join(@rawdir, physio_files[:phys_directory], physio_files[:respiration_signal])
-    end
-    
-    outfile = prefix + file
-
-    icor_format = "3dretroicor -prefix %s -card %s -resp %s %s"
-    icor_options = [outfile, cardiac_signal, respiration_signal, file]
-    icor_cmd = icor_format % icor_options
-    return icor_cmd, outfile
-  end
-  
-  private
-  
-  def reconstruct_dicom_sequence(scan_spec, outfile)
-    scandir = File.join(@rawdir, scan_spec['dir'])
-		$Log.info "Dicom Reconstruction: #{scandir}"
-		Pathname.new(scandir).all_dicoms do |dicoms|
-		
-  		# second_file = File.join(scandir, 'I0002.dcm')
-  		# wildcard = File.join(scandir,'I*dcm')
-  		
-  		local_scandir = File.dirname(dicoms.first)
-		
-  		second_file = Dir.glob( File.join(local_scandir, "*0002*") )
-  		wildcard = File.join(local_scandir, "*.[0-9]*")
-		
-  		recon_cmd_format = 'to3d -skip_outliers %s -prefix tmp.nii "%s"'
-
-  		timing_opts = timing_options(scan_spec, second_file)
-		
-  		unless run(recon_cmd_format % [timing_opts, wildcard])
-  			raise(IOError,"Failed to reconstruct scan: #{scandir}")
-  		end
-		end
-  end
-  
-  def reconstruct_pfile_sequence(scan_spec, outfile)
-    base_pfile_path = File.join(@rawdir, scan_spec['pfile'])
-    pfile_path = File.exist?(base_pfile_path) ? base_pfile_path : base_pfile_path + '.bz2'
-    
-    raise IOError, "#{pfile_path} does not exist." unless File.exist?(pfile_path)
-      
-		flash "Pfile Reconstruction: #{pfile_path}"
-		Pathname.new(pfile_path).local_copy do |pfile|
-		  reconstruct_pfile(pfile, outfile, scan_spec['volumes_to_skip'], scan_spec['refdat_stem'] || false)
-	  end    
-  end
-  
-  # Reconstructs a single pfile into the epirecon default brik/head when
-  # given a temporary working directory, path to the pfile and the task to
-  # use when naming the output.
-  def reconstruct_pfile(pfile, label, volumes_to_skip = 3, refdat_stem = false)
-		refdat_file = refdat_stem ? refdat_stem : search_for_refdat_file
-		setup_refdat(refdat_file)
-    epirecon_cmd_format = "epirecon_ex -f %s -NAME %s -skip %d -scltype=0"
-		epirecon_cmd = epirecon_cmd_format % [pfile, label, volumes_to_skip]
-		raise ScriptError, "Problem running #{epirecon_cmd}" unless run(epirecon_cmd)
-  end
-  
-  def search_for_refdat_file
-    Dir.new(@rawdir).each do |file|
-      return file if file =~ /ref.dat/
-    end
-    raise ScriptError, "No candidate ref.dat file found in #{@rawdir}"
-  end
-  
-  def setup_refdat(refdat_stem)
-    base_refdat_path = File.join(@rawdir, refdat_stem)
-    refdat_path = File.exist?(base_refdat_path) ? base_refdat_path : base_refdat_path + ".bz2"
-    raise IOError, "#{refdat_path} does not exist." unless File.exist?(refdat_path)
-    local_refdat_file = Pathname.new(refdat_path).local_copy
-    FileUtils.ln_s(local_refdat_file, Dir.pwd, :force => true)
-  end
-
 	
 end
