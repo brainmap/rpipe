@@ -12,6 +12,8 @@ require 'yaml'
 require 'pp'
 require 'rubygems'
 
+require 'global_additions'
+
 $MRI_DATA = ENV['MRI_DATA'] || '/Data/vtrak1/raw/test/fixtures/rpipe'
 
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))

@@ -5,7 +5,7 @@ module DefaultPreproc
 	# Runs the preprocessing job, including spm job customization, run spm job, and handling motion issues.
 	# This function assumes a destination directory is set up; it will overwrite preexisting data.	Careful!
 	def preproc_visit
-		flash "Spatial Preprocessing Subject: #{@subid}"
+		$Log.info "Spatial Preprocessing Subject: #{@subid}"
 		
 		setup_directory(@procdir, "PREPROC")
 		

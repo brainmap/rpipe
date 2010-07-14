@@ -1,9 +1,18 @@
 #!/usr/bin/env ruby
 $LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'lib')
-require 'trollop'
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', 'vendor')
+begin
+  require 'trollop'
+  require 'output_catcher'
+  require 'pp'
+  require 'log4r'
+rescue LoadError
+  require 'rubygems'
+  retry
+end
 require 'rpipe'
-require 'pp'
 
+STEPS = %w(recon preproc stats)
 VERSION_NUMBER = "0.0.0"
 VERSION_LINE = "rpipe %s WADRC Imaging Core" % VERSION_NUMBER
 BANNER = <<-EOS
@@ -11,43 +20,92 @@ A utility for running neuroimaging rpipe jobs.
 
 Usage: rpipe [options] <driver>
 EOS
-STEPS = %w(recon preproc stats)
 
-opts = Trollop::options do
-	version VERSION_LINE
-	banner BANNER
-	opt :only, "Perform only a certain step (recon, preproc, stats)", :type => String
-	opt :debug, "Be more wordy than usual for debugging"
+def run!
+  options, driver = setup_options
+  setup_logging File.basename(driver, File.extname(driver))
+  
+  $Log.info "Begin Pipelining #{driver}"
+  run_pipe(options, driver)
+  $Log.info "Finished Pipelining #{driver}"
+
 end
 
-if opts[:only_given]
-	unless STEPS.include?(opts[:only])
-		Trollop::die :only, "must be one of recon, preproc, or stats"
-	end
+def run_pipe(options, driver)
+
+  pipe = RPipe.new(driver)
+  pp pipe if options[:debug]
+
+  if options[:only_given]
+  	case options[:only]
+  	when "recon"
+  		pipe.recon_jobs.each { |job| job.perform }
+  	when "preproc"
+  		pipe.preproc_jobs.each { |job| job.perform }
+  	when "stats"
+  		pipe.stats_jobs.each { |job| job.perform }
+  	end
+  else
+  	pipe.recon_jobs.each { |job| job.perform }
+  	pipe.preproc_jobs.each { |job| job.perform }
+  	pipe.stats_jobs.each { |job| job.perform }
+  end
 end
 
-Trollop::die "Driver file not given" if (ARGV.size < 1)
-driver = ARGV.shift
-Trollop::die :driver, "file does not exist" unless File.exist?(driver)
+def setup_options
+  opts = Trollop::options do
+  	version VERSION_LINE
+  	banner BANNER
+  	opt :only, "Perform only a certain step (recon, preproc, stats)", :type => String
+  	opt :debug, "Be more wordy than usual for debugging"
+  end
 
-pp opts if opts[:debug]
-pipe = RPipe.new(driver)
-pp pipe if opts[:debug]
+  if opts[:only_given]
+  	unless STEPS.include?(opts[:only])
+  		Trollop::die :only, "must be one of recon, preproc, or stats"
+  	end
+  end
 
+  Trollop::die "Driver file not given" if (ARGV.size < 1)
+  driver = ARGV.shift
+  Trollop::die :driver, "file does not exist" unless File.exist?(driver)
 
-if opts[:only_given]
-	case opts[:only]
-	when "recon"
-		pipe.recon_jobs.each { |job| job.perform }
-	when "preproc"
-		pipe.preproc_jobs.each { |job| job.perform }
-	when "stats"
-		pipe.stats_jobs.each { |job| job.perform }
-	end
-else
-	pipe.recon_jobs.each { |job| job.perform }
-	pipe.preproc_jobs.each { |job| job.perform }
-	pipe.stats_jobs.each { |job| job.perform }
+  pp opts if opts[:debug]
+  
+  return opts, driver
+end
+
+def setup_logging(logfile_stem)
+  teeout = Tee.new(logfile_stem + '.out', :out)
+  teeerr = Tee.new(logfile_stem + '.err', :err)
+  
+  setup_logger(logfile_stem + 'log', teeout)
+end
+
+def setup_logger(command_logfile, tee)
+  console_pattern = "#{'*' * 10} %m [ %d ]"
+  $Log = Log4r::Logger.new('output')
+  $Log.add Log4r::IOOutputter.new(:stdout, tee, :formatter => FlashFormatter.new)
+
+  File.delete command_logfile if File.exist? command_logfile
+  $CommandLog = Log4r::Logger.new('command::output')
+  $CommandLog.add Log4r::FileOutputter.new(:file, :filename => command_logfile, :formatter => Log4r::PatternFormatter.new(:pattern => "%m"))
+  $CommandLog.add Log4r::IOOutputter.new(:stdout, tee, :formatter => FlashFormatter.new)
 end
 
 
+class FlashFormatter < Log4r::Formatter
+  def format(logevent)
+    buff = "\n"
+  	buff << "+" * 120 + "\n"
+  	buff << sprintf("\t%s\n", logevent.data)
+  	buff << sprintf("\t%s\n", Time.now)
+  	buff << "+" * 120 + "\n"
+  	buff << "\n"
+  	return buff
+  end
+end
+
+if __FILE__ == $0
+  run!
+end

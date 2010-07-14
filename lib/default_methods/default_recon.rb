@@ -68,16 +68,16 @@ module DefaultRecon
 	# Removes the specified number of volumes from the beginning of a 4D functional nifti file.
 	# In most cases this will be 3 volumes. Writes result in current working directory.
 	def strip_leading_volumes(infile, outfile, volume_skip, bold_reps)
-		flash "Stripping #{volume_skip.to_s} leading volumes: #{infile}"
-		puts cmd = "fslroi #{infile} #{outfile} #{volume_skip.to_s} #{bold_reps.to_s}"
-		unless run(cmd)
+		$Log.info "Stripping #{volume_skip.to_s} leading volumes: #{infile}"
+		cmd_fmt = "fslroi %s %s %s %s" 
+		unless run(cmd_fmt % [infile, outfile, volume_skip.to_s, bold_reps.to_s])
 		  raise ScriptError, "Failed to strip volumes: #{cmd}"
 	  end
 	end
 	
 	# Uses to3d to slice time correct a 4D functional nifti file.	 Writes result in the current working directory.
 	def slice_time_correct(infile)
-		flash "Slice Timing Correction: #{infile}"
+		$Log.info "Slice Timing Correction: #{infile}"
 		cmd = "3dTshift -tzero 0 -tpattern alt+z -prefix a#{infile} #{infile}"
 		unless run(cmd)
 		  raise ScriptError, "Failed to slice time correct: #{cmd}"
@@ -151,7 +151,7 @@ module DefaultRecon
   
   def reconstruct_dicom_sequence(scan_spec, outfile)
     scandir = File.join(@rawdir, scan_spec['dir'])
-		flash "Dicom Reconstruction: #{scandir}"
+		$Log.info "Dicom Reconstruction: #{scandir}"
 		Pathname.new(scandir).all_dicoms do |dicoms|
 		
   		# second_file = File.join(scandir, 'I0002.dcm')

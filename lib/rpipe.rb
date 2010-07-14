@@ -16,6 +16,9 @@ require 'metamri/core_additions'
 # prevent zipping in FSL programs
 ENV['FSLOUTPUTTYPE'] = 'NIFTI'
 
+require 'default_logger'
+require 'global_additions'
+
 class JobStep
 	
 	COLLISION_POLICY = :panic # options -- :panic, :destroy, :overwrite
@@ -49,17 +52,6 @@ class JobStep
 			require module_name
 			extend self.class.const_get(module_name.dot_camelize)
 		end
-	end
-	
-	# displays a message and the date/time to standard output.
-	def flash(msg)
-		puts
-		puts "+" * 120
-		printf "\t%s\n", msg
-		printf "\t%s\n", Time.now
-		puts "+" * 120
-		puts
-		$Log.info msg
 	end
 	
 	# Setup directory path according to collision policy.
@@ -107,16 +99,7 @@ class JobStep
     end
   end
   
-  # Run and Log and command to the system.
-  def run(command)
-    $CommandLog.info command
-    
-    status = POpen4::popen4(command) do |stdout, stderr|
-      puts $Log.info stdout.read.strip
-    end
-        
-    status.exitstatus == 0 ? true : false
-  end
+
   	
 end
 
@@ -215,6 +198,7 @@ end
 class RPipe
 	
 	include Log4r
+	include DefaultLogger
 	
 	attr_accessor :recon_jobs, :preproc_jobs, :stats_jobs, :workflow_spec
 	
@@ -264,18 +248,6 @@ class RPipe
   # To compare jobs look at their configuration, not ruby object identity.
   def ==(other_rpipe)
     @workflow_spec == other_rpipe.workflow_spec
-  end
-  
-  def setup_logger
-    console_pattern = "#{"+" * 120}\n\t%m\n\t%d\n#{"+" * 120}\n"
-    $Log = Logger.new('output')
-    $Log.add StdoutOutputter.new(:stdout, :formatter => PatternFormatter.new(:pattern => console_pattern))
-
-    command_log = @workflow_spec['subid'] + '.log'
-    File.delete command_log if File.exist? command_log
-    $CommandLog = Logger.new('command::output')
-    $CommandLog.add FileOutputter.new(:file, :filename => command_log, :formatter => PatternFormatter.new(:pattern => "%m"))
-    $CommandLog.add StdoutOutputter.new(:stdout, :formatter => PatternFormatter.new(:pattern => console_pattern))
   end
 	
 end

@@ -60,6 +60,12 @@ task :test => :check_dependencies
 
 task :default => [:spec, :test]
 
+begin
+  gem 'darkfish-rdoc'
+  require 'darkfish-rdoc/rdoctask'
+rescue LoadError
+  "Not using darkfish."
+end
 require 'rake/rdoctask'
 Rake::RDocTask.new do |rdoc|
   version = File.exist?('VERSION') ? File.read('VERSION') : ""
@@ -68,4 +74,5 @@ Rake::RDocTask.new do |rdoc|
   rdoc.title = "rpipe #{version}"
   rdoc.rdoc_files.include('README*')
   rdoc.rdoc_files.include('lib/**/*.rb')
+  rdoc.options += ['darkfish'] 
 end

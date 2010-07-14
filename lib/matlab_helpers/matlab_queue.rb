@@ -1,6 +1,9 @@
-###############################################	 START OF CLASS	 ######################################################
-# An object that maintains and runs matlab jobs and paths.
+require 'default_logger'
+
+# Maintain and run matlab commands and paths.
 class MatlabQueue
+  include DefaultLogger
+  
   attr_accessor :paths, :commands, :ml_command
   attr_reader :success
   
@@ -8,6 +11,7 @@ class MatlabQueue
     @paths = []
     @commands = []
     @ml_command = "matlab -nosplash -nodesktop"
+    setup_logger
   end
   
   def to_s
@@ -18,9 +22,8 @@ class MatlabQueue
   end
   
   def run!
-    flash cmd = @ml_command + " -r \"#{ to_s }; exit\" "
-    system(cmd)
-    @success = ($? == 0) ? true : false
+    cmd = @ml_command + " -r \"#{ to_s }; exit\" "
+    @success = run(cmd)
   end
   
   def method_missing(m, *args, &block)
@@ -31,13 +34,4 @@ class MatlabQueue
     args.each { |arg| @paths << arg }
   end
   
-  def flash(msg)
-		puts
-	  puts sep = "+" * (msg.length + 4)
-		printf "  %s\n", msg
-		printf "  %s\n", Time.now
-		puts sep
-		puts
-	end
 end
-###############################################	 END OF CLASS	 #########################################################

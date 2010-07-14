@@ -1,10 +1,12 @@
 require 'pp'
-require 'matlab_helpers/matlab_queue'
 require 'ruport'
+require 'default_logger'
+require 'matlab_helpers/matlab_queue'
 
 ###############################################	 START OF CLASS	 ######################################################
 # An object that helps parse and format Behavioral Logfiles.
 class Logfile
+  include DefaultLogger
   
   # An array of rows raw text data 
   attr_accessor :textfile_data
@@ -40,6 +42,8 @@ class Logfile
     if @conditions.empty?
       raise ScriptError, "Could not set conditions #{conditions}" unless conditions.empty?
     end
+    
+    setup_logger
 
   end
   
@@ -254,7 +258,7 @@ class Logfile
       next if line.empty?
       # Headers are written in the Textfile as "New(Correct)".
       # Convert them to proper condition names - downcase separated by underscores
-      header = line.first.gsub(/(\(|\))/, '_').downcase.chomp("_").to_sym
+      header = pretty_condition(line.first)
       vector = line[2..-1].collect {|val| val.to_f } if line[2..-1]
 
       # Make sure this isn't a column line inside the logfile.
@@ -297,6 +301,10 @@ class Logfile
       row[max_length] = nil
       row.pop
     end
+  end
+  
+  def pretty_condition(condition)
+    condition.gsub(/(\(|\))/, '_').downcase.chomp("_").to_sym
   end
   
 end

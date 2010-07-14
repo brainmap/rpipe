@@ -16,7 +16,7 @@ describe "Integration Processing for Johnson.Tbi.Longitudinal.Snod" do
   
   it "should reconstruct raw data" do
     pipe = RPipe.new(@driver)
-    pipe.recon_jobs.each do |recon_job|
+    pipe.recon_jobs.first do |recon_job|
       recon_job.perform
     end
     

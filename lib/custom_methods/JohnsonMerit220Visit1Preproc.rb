@@ -32,7 +32,6 @@ module JohnsonMerit220Visit1Preproc
     { #{@bold_reps.join(' ') } }, \
     'JohnsonMerit220Visit1Preproc_job.m')"
     
-    puts queue.to_s
     queue.run!
   end
   

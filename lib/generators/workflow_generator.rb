@@ -22,6 +22,7 @@ class WorkflowGenerator < JobGenerator
   
   def initialize(rawdir, config = Hash.new)
     config_defaults = {}
+    config_defaults['conditions'] = ['new_correct', 'new_incorrect', 'old_correct', 'old_incorrect']
     config_defaults['processing_dir'] = Dir.mktmpdir
     super config_defaults.merge(config)
     
@@ -43,7 +44,7 @@ class WorkflowGenerator < JobGenerator
     jobs = []
     
     # Recon
-    recon_options = {'rawdir' => @rawdir}
+    recon_options = {'rawdir' => @rawdir, 'epi_pattern' => /(Resting|Task)/i, }
     config_step_method(recon_options, 'recon') if @config['custom_methods']
     jobs << ReconJobGenerator.new(recon_options).build
     
@@ -55,7 +56,7 @@ class WorkflowGenerator < JobGenerator
     # Stats
     stats_options = {
       'scans' => jobs.first['scans'],
-      'conditions' => ['new_correct', 'new_incorrect', 'old_correct', 'old_incorrect'],
+      'conditions' => @config['conditions'],
       'responses_dir' => @config['responses_dir'],
       'subid' => @spec['subid']
     }
