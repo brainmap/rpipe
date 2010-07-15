@@ -13,6 +13,7 @@ require 'pp'
 require 'rubygems'
 
 require 'global_additions'
+require 'core_additions'
 
 $MRI_DATA = ENV['MRI_DATA'] || '/Data/vtrak1/raw/test/fixtures/rpipe'
 
