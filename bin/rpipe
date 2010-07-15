@@ -21,16 +21,18 @@ A utility for running neuroimaging rpipe jobs.
 Usage: rpipe [options] <driver>
 EOS
 
+# Main Function for the CLI runner.
 def run!
   options, driver = setup_options
-  setup_logging File.basename(driver, File.extname(driver))
-  
-  $Log.info "Begin Pipelining #{driver}"
-  run_pipe(options, driver)
-  $Log.info "Finished Pipelining #{driver}"
+  run_with_logging File.basename(driver, File.extname(driver)) do  
+    $Log.info "Begin Pipelining #{driver}"
+    run_pipe(options, driver)
+    $Log.info "Finished Pipelining #{driver}"
+  end
 
 end
 
+# Perform Each of the Jobs in a Pipe
 def run_pipe(options, driver)
 
   pipe = RPipe.new(driver)
@@ -52,6 +54,7 @@ def run_pipe(options, driver)
   end
 end
 
+# Setup Trollop Options
 def setup_options
   opts = Trollop::options do
   	version VERSION_LINE
@@ -75,13 +78,28 @@ def setup_options
   return opts, driver
 end
 
-def setup_logging(logfile_stem)
-  teeout = Tee.new(logfile_stem + '.out', :out)
-  teeerr = Tee.new(logfile_stem + '.err', :err)
+# Setup Tee IO's for Out and Error and start logs for them.
+def run_with_logging(logfile_stem, &block)
+  out_logfile     = logfile_stem + '.out'
+  error_logfile   = logfile_stem + '.err'
+  command_logfile = logfile_stem + '.log'
   
-  setup_logger(logfile_stem + '.log', teeout)
+  teeout = Tee.new(out_logfile, :out)
+  teeerr = Tee.new(error_logfile, :err)
+  
+  setup_logger(command_logfile, teeout)
+  
+  begin
+    yield
+  ensure
+    # Discard the error log if there were no errors.
+    # Size returns nil for an empty file.
+    teeerr.close
+    File.delete(error_logfile) unless File.size?(error_logfile)
+  end
 end
 
+# Log Commands to a file and Output to stdout
 def setup_logger(command_logfile, tee)
   console_pattern = "#{'*' * 10} %m [ %d ]"
   $Log = Log4r::Logger.new('output')
@@ -94,7 +112,9 @@ def setup_logger(command_logfile, tee)
 end
 
 
+# Formatter for Logging
 class FlashFormatter < Log4r::Formatter
+  # Easy-to-read formatting
   def format(logevent)
     buff = "\n"
   	buff << "+" * 120 + "\n"
