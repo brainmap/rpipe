@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '..', 'helper_spec')
+require 'helper_spec'
 require 'rpipe'
 
 describe "Integration Processing for Johnson.Tbi.Longitudinal.Snod" do
@@ -16,11 +16,14 @@ describe "Integration Processing for Johnson.Tbi.Longitudinal.Snod" do
   
   it "should reconstruct raw data" do
     pipe = RPipe.new(@driver)
-    pipe.recon_jobs.first do |recon_job|
+
+    # pipe.recon_jobs.first.perform
+    pipe.recon_jobs.each do |recon_job|
       recon_job.perform
     end
     
-    @origdir = @driver['origdir'] if Dir.compare_directories(@origdir, @completed_orig_directory)
+    # Use instance variables to pass on local directories to subsequent tests if this one was successful.
+    @origdir = @driver['origdir'] if Dir.compare_directories(@driver['origdir'], @completed_orig_directory)
   end
    
   it "should preprocess reconstructed data" do
@@ -30,7 +33,7 @@ describe "Integration Processing for Johnson.Tbi.Longitudinal.Snod" do
     pipe = RPipe.new(@driver)
     p = pipe.preproc_jobs.first
     p.perform
-    @procdir = @driver['procdir'] if Dir.compare_directories(@procdir, @completed_proc_directory)    
+    @procdir = @driver['procdir'] if Dir.compare_directories(@driver['procdir'], @completed_proc_directory)    
   end
   
   it "should run stats on processed data" do
@@ -38,7 +41,7 @@ describe "Integration Processing for Johnson.Tbi.Longitudinal.Snod" do
     pipe = RPipe.new(@driver)
     s = pipe.stats_jobs.first
     s.perform
-    @statsdir = @driver['statsdir'] if Dir.compare_directories(File.join(@statsdir, 'v1'), @completed_stats_directory)
+    @statsdir = @driver['statsdir'] if Dir.compare_directories(File.join(@driver['statsdir'], 'v1'), @completed_stats_directory)
   end
 
 end

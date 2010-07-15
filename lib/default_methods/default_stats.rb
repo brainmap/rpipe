@@ -66,6 +66,7 @@ module DefaultStats
 	  onsets_mat_files = []
 	  wd = Dir.pwd
 	  matching_directories = Dir.glob(responses['directory'])
+	  raise IOError, "Response directory #{responses['directory']} doesn't exist." unless File.directory?(responses['directory'])
 	  raise IOError, "Only one response directory currently accepted (matched directories: #{matching_directories.join(', ')})" unless matching_directories.length == 1
 	  Dir.chdir matching_directories.first  do
 	    responses['logfiles'].each do |logfile|

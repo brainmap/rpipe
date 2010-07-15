@@ -1,5 +1,5 @@
 subid: mrt00000
-rawdir: /Data/scratch/mrt00000/dicoms
+rawdir: /Data/vtrak1/raw/test/fixtures/rpipe/johnson.merit220.visit1/mrt00000/dicoms
 origdir: /Data/scratch/mrt00000_orig
 procdir: /Data/scratch/mrt00000_proc
 statsdir: /Data/scratch/mrt00000_stats
@@ -39,7 +39,7 @@ jobs:
   - step: stats
     method: JohnsonMerit220Visit1Stats
     responses:
-      directory: rpipe/spec/fixtures/rawdata/responses
+      directory: /Data/vtrak1/raw/test/fixtures/rpipe/responses
       logfiles: 
         - mrt00000_abc_01012010_faces3_recognitionB.txt
         - mrt00000_abc_01012010_faces3_recognitionA.txt

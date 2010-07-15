@@ -25,8 +25,8 @@ module JohnsonTbiLongitudinalSnodPreproc
 	  queue = MatlabQueue.new
 	  queue.paths << ['/Applications/spm/spm8/spm8_current', 
 	    '/apps/spm/spm8_current',
-      File.join(@root_dir, 'custom_methods'), 
-      File.join(@root_dir, 'matlab_helpers')
+      File.join(@libdir, 'custom_methods'), 
+      File.join(@libdir, 'matlab_helpers')
     ]
 
 	  queue << "JohnsonTbiLongitudinalSnodPreproc('#{@procdir}/', \

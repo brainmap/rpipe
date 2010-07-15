@@ -22,10 +22,10 @@ module DefaultRecon
 				reconstruct_scan(scan_spec, outfile)
 				
 				if scan_spec['type'] == "func"
-					if scan_spec['physio_files']
-            # create_physiosnoise_regressors(scan_spec)
-            outfile = run_retroicor(scan_spec['physio_files'], outfile)
-				  end
+          # if scan_spec['physio_files']
+          #   create_physiosnoise_regressors(scan_spec)
+          #   outfile = run_retroicor(scan_spec['physio_files'], outfile)
+          # end
 				  
 					slice_time_correct(outfile)
 				else

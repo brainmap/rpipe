@@ -3,7 +3,7 @@ require 'rpipe'
 
 describe "Integration Processing for Johnson.Merit220" do
   before(:all) do
-    @driver_file = File.join(File.dirname(__FILE__), 'drivers', 'mrt00000.yml')
+    @driver_file = File.join(File.dirname(__FILE__), '..', 'drivers', 'mrt00000.yml')
     @driver = YAML.load_file(@driver_file)	  
     @driver['rawdir']   = File.join($MRI_DATA, 'johnson.merit220.visit1', 'mrt00000', 'dicoms')
     @driver['origdir']  = Dir.mktmpdir('orig_')
@@ -20,31 +20,28 @@ describe "Integration Processing for Johnson.Merit220" do
     
   end
   
-  # it "should reconstruct raw data" do
-  #   pipe = RPipe.new(@driver)
-  #   p = pipe.recon_jobs.first
-  #   p.perform
-  #   @origdir = @driver['origdir']
-  #   Dir.compare_directories(@origdir, @completed_orig_directory)
-  # end
-  #  
+  it "should reconstruct raw data" do
+    pipe = RPipe.new(@driver)
+    p = pipe.recon_jobs.first
+    p.perform
+    @origdir = @driver['origdir'] if Dir.compare_directories(@driver['origdir'], @completed_orig_directory)
+  end
+   
   it "should preprocess raw data" do
-    @driver['origdir']  = @origdir || @completed_orig_directory
+    @driver['origdir']  = @origdir || Pathname.new(@completed_orig_directory).recursive_local_copy
     pipe = RPipe.new(@driver)
     p = pipe.preproc_jobs.first
     p.perform
-    @procdir = @driver['procdir']
-    Dir.compare_directories(@procdir, @completed_proc_directory)    
+    @procdir = @driver['procdir'] if Dir.compare_directories(@driver['procdir'], @completed_proc_directory)
   end
   
-  # it "should run stats on processed data" do
-  #   @driver['procdir'] = @procdir || @completed_proc_directory
-  #   pipe = RPipe.new(@driver)
-  #   s = pipe.stats_jobs.first
-  #   s.perform
-  #   @statsdir = @driver['statsdir']
-  #   # Dir.compare_directories(@statsdir, @completed_stats_directory)
-  # end
+  it "should run stats on processed data" do
+    @driver['procdir'] = @procdir || @completed_proc_directory
+    pipe = RPipe.new(@driver)
+    s = pipe.stats_jobs.first
+    s.perform
+    @statsdir = @driver['statsdir'] if Dir.compare_directories(@driver['statsdir'], @completed_stats_directory)
+  end
 
 end
 

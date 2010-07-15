@@ -30,6 +30,12 @@ module DefaultPreproc
     end
 	end
 	
+	def check_permissions(files)
+	  unwritable = []
+	  files.collect { |file| unwritable << file unless File.writable?(file) }
+    raise IOError, "Cannot write to #{unwritable.join(", ")} files." unless unwritable.empty?
+  end
+	
 	# Customizes the template job in preproc_spec to be specific for this particular preproc job.
 	# Performs to recursive string replacements inside the spm job:
 	# - path inside template is replaced with destination "proc" directory

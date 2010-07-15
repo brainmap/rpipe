@@ -10,6 +10,9 @@ function [] = JohnsonMerit220Visit1Preproc(studypath, images, image_boldreps, jo
 % Realign: Estimate: Session - cfg_files
 % Realign: Estimate: Session - cfg_files
 % Realign: Estimate: Session - cfg_files
+
+spm('defaults', 'FMRI');
+
 nrun = 1; % enter the number of runs here
 jobfile = {job_mfile};
 jobs = repmat(jobfile, 1, nrun);
@@ -20,5 +23,4 @@ for crun = 1:nrun
 			inputs{index, crun} = CreateFunctionalVolumeStruct(studypath, images{index}, image_boldreps{index}); % Realign: Estimate: Session - cfg_files
     end
 end
-spm('defaults', 'FMRI');
 spm_jobman('serial', jobs, '', inputs{:});

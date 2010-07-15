@@ -23,7 +23,7 @@ module JohnsonTbiLongitudinalSnodStats
   end
   
   def setup_conditions
-    @conditions = @conditions ? @conditions.collect! {|c| c.to_sym if c.respond_to? :to_sym } : DEFAULT_CONDITIONS 
+    @conditions = @conditions ? @conditions.collect {|c| c.to_sym if c.respond_to? :to_sym } : DEFAULT_CONDITIONS 
   end
   
   def create_or_link_onsets_files
@@ -50,8 +50,8 @@ module JohnsonTbiLongitudinalSnodStats
 	  queue.paths << [
 	    '/Applications/spm/spm8/spm8_current', 
 	    '/apps/spm/spm8_current',
-      File.join(@root_dir, 'custom_methods'), 
-      File.join(@root_dir, 'matlab_helpers')    ]
+      File.join(@libdir, 'custom_methods'), 
+      File.join(@libdir, 'matlab_helpers')    ]
 
 	  queue << "JohnsonTbiLongitudinalSnodStats('#{@statsdir}/', \
     { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \

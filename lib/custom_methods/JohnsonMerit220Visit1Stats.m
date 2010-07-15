@@ -28,32 +28,22 @@ eval(['load ' conditions{1}]);
 
 switch numel(names)
     case 2 % New, Old
-        fcontrast_vector = [1 0 zeros(1,8)
-                            0 1 zeros(1,8)
-                            zeros(1,8) 1 0
-                            zeros(1,8) 0 1 ];
+        fcontrast_vector = [1 0 
+                            0 1 ];
         tcontrast_1_vector = [-1 1];
         tcontrast_2_vector = [1 -1];        
     case 4 % New_correct, New_incorrect, Old_correct, Old_incorrect
-        fcontrast_vector = [1 0 0 0 zeros(1,10)
-                            0 1 0 0 zeros(1,10)
-                            0 0 1 0 zeros(1,10)
-                            0 0 0 1 zeros(1,10)
-                            zeros(1,10) 1 0 0 0
-                            zeros(1,10) 0 1 0 0
-                            zeros(1,10) 0 0 1 0
-                            zeros(1,10) 0 0 0 1 ];
+        fcontrast_vector = [1 0 0 0 
+                            0 1 0 0 
+                            0 0 1 0 
+                            0 0 0 1 ];
         tcontrast_1_vector = [-1 0  1 0];
         tcontrast_2_vector = [ 1 0 -1 0];
     case 5 % New_correct, New_incorrect, Old_correct, Old_incorrect, Misses
-        fcontrast_vector = [1 0 0 0 zeros(1,11)
-                            0 1 0 0 zeros(1,11)
-                            0 0 1 0 zeros(1,11)
-                            0 0 0 1 zeros(1,11)
-                            zeros(1,11) 1 0 0 0
-                            zeros(1,11) 0 1 0 0
-                            zeros(1,11) 0 0 1 0
-                            zeros(1,11) 0 0 0 1];
+        fcontrast_vector = [1 0 0 0 
+                            0 1 0 0 
+                            0 0 1 0 
+                            0 0 0 1 ];
         tcontrast_1_vector = [-1 0  1 0];
         tcontrast_2_vector = [ 1 0 -1 0];
     otherwise
@@ -75,7 +65,7 @@ for crun = 1:nrun
 			inputs{offset + 8, crun}  = tcontrast_1_vector; % fMRI model specification: T Contrast 1 Vector - cfg_entry
 			inputs{offset + 9, crun}  = 'NV > PV';   % fMRI model specification: T Contrast 2 Title - cfg_entry
 			inputs{offset + 10, crun} = tcontrast_2_vector; % fMRI model specification: T Contrast 2 Vector - cfg_entry
-        end
+    end
 
 end
 

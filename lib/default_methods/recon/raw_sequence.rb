@@ -1,7 +1,8 @@
 module DefaultRecon
   # An abstract class for Raw Image Sequences
-  # The Recon job will call prepare on Raw Sequences to convert them from 
-  # their raw state to Nifti files suitable for processing.
+  # The Recon job will calls prepare on Raw Sequence Instances to process 
+  # them from their raw state (dicoms or pfiles) to Nifti files suitable for
+  # processing.
   class RawSequence
     def initialize(scan_spec, rawdir)
       @scan_spec = scan_spec
@@ -39,9 +40,10 @@ module DefaultRecon
       end
     end
   
-    # Determines the proper timing options to pass to to3d for functional scans.  Must pass a static path to
-    # the second file in the series to determine zt vs tz ordering.  Assumes 2sec TR's.  Returns the options
-    # as a string that may be empty if the scan is an anatomical.
+    # Determines the proper timing options to pass to to3d for functional scans.
+    # Must pass a static path to the second file in the series to determine zt
+    # versus tz ordering. Assumes 2sec TR's. Returns the options as a string 
+    # that may be empty if the scan is an anatomical.
     def timing_options(scan_spec, second_file)
       return "" if scan_spec['type'] == "anat"
       instance_offset = scan_spec['z_slices'] + 1
@@ -77,7 +79,7 @@ module DefaultRecon
     def reconstruct_sequence(outfile)
       volumes_to_skip = @scan_spec['volumes_to_skip'] ||= 3
       epirecon_cmd_format = "epirecon_ex -f %s -NAME %s -skip %d -scltype=0"
-      epirecon_cmd_options = [@pfile_data, @scan_spec['label'], volumes_to_skip]
+      epirecon_cmd_options = [@pfile_data, outfile, volumes_to_skip]
       epirecon_cmd = epirecon_cmd_format % epirecon_cmd_options
       raise ScriptError, "Problem running #{epirecon_cmd}" unless run(epirecon_cmd)
     end

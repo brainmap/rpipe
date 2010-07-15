@@ -79,7 +79,7 @@ def setup_logging(logfile_stem)
   teeout = Tee.new(logfile_stem + '.out', :out)
   teeerr = Tee.new(logfile_stem + '.err', :err)
   
-  setup_logger(logfile_stem + 'log', teeout)
+  setup_logger(logfile_stem + '.log', teeout)
 end
 
 def setup_logger(command_logfile, tee)

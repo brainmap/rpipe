@@ -23,7 +23,7 @@ class JobStep
 	
 	COLLISION_POLICY = :panic # options -- :panic, :destroy, :overwrite
 	
-	attr_accessor :subid, :rawdir, :origdir, :procdir, :statsdir, :spmdir, :collision_policy, :root_dir
+	attr_accessor :subid, :rawdir, :origdir, :procdir, :statsdir, :spmdir, :collision_policy, :libdir
 	
 	# Intialize with two configuration option hashes - workflow_spec and job_spec
 	def initialize(workflow_spec, job_spec)
@@ -39,7 +39,7 @@ class JobStep
 		@collision_policy = (job_spec['collision'] || workflow_spec['collision'] || COLLISION_POLICY).to_sym
 		@method = job_spec['method']
 		include_custom_methods(@method)
-		@root_dir = File.dirname(Pathname.new(__FILE__).realpath)
+		@libdir = File.dirname(Pathname.new(__FILE__).realpath)
 		
 		job_requires 'subid'
 	end
@@ -202,7 +202,7 @@ class RPipe
 	
 	attr_accessor :recon_jobs, :preproc_jobs, :stats_jobs, :workflow_spec
 	
-	ROOT_DIR = File.expand_path(File.dirname(__FILE__))
+	libdir = File.expand_path(File.dirname(__FILE__))
 	
 	# Initialize an RPipe instance by passing it a pipeline configuration driver.
 	# Drivers contain a list of entries, each of which contains all the 
@@ -236,14 +236,14 @@ class RPipe
 	  
 	end
 	
-	private
-	
-	# Read the YAML file, parses it with ERB and returns the Driver Configuration.
+	# Reads a YAML driver file, parses it with ERB and returns the Configuration Hash.
 	# Raises an error if the file is not found in the file system.
 	def read_driver_file(driver_file)
 		raise(IOError, "Driver file not found: #{driver_file}") unless File.exist?(driver_file)
 		YAML.load(ERB.new(File.read(driver_file)).result) 
   end
+  
+  private
   
   # To compare jobs look at their configuration, not ruby object identity.
   def ==(other_rpipe)

@@ -9,6 +9,7 @@ module JohnsonMerit220Visit1Preproc
 		
 		Dir.chdir(@procdir) do
 			link_files_into_proc
+			check_permissions(image_files)
       run_preproc_mfile
 			deal_with_motion
 		end
@@ -18,17 +19,21 @@ module JohnsonMerit220Visit1Preproc
 	
 	private
 	
+	def image_files
+	  @image_files ||= Dir.glob(File.join(@origdir, "a*#{@subid}*.nii"))
+	end
+	
 	def run_preproc_mfile
-	  images = Dir.glob(File.join(@origdir, "a*#{@subid}*.nii"))
-	  raise ScriptError, "Can't find any slice-time corrected images in #{@origdir}" if images.empty?
+	  raise ScriptError, "Can't find any slice-time corrected images in #{@origdir}" if image_files.empty?
 	  queue = MatlabQueue.new
-	  queue.paths << ['/Applications/spm/spm8/spm8_current', 
-      File.join(@root_dir, 'custom_methods'), 
-      File.join(@root_dir, 'matlab_helpers')
+	  queue.paths << ['/Applications/spm/spm8/spm8_current',
+	    '/apps/spm/spm8_current',
+      File.join(@libdir, 'custom_methods'), 
+      File.join(@libdir, 'matlab_helpers')
     ]
 
 	  queue << "JohnsonMerit220Visit1Preproc('#{@procdir}/', \
-    { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \
+    { #{image_files.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \
     { #{@bold_reps.join(' ') } }, \
     'JohnsonMerit220Visit1Preproc_job.m')"
     

@@ -45,6 +45,7 @@ describe "Unit testing for johnson.merit220.visit1" do
   
   it "should convert logfiles into matfiles including misses as a condition" do
     conditions = [:new_correct, :new_incorrect, :old_correct, :old_incorrect, {:misses => [:new_misses, :old_misses]} ]
+    output_conditions = ['new_correct', 'new_incorrect', 'old_correct', 'old_incorrect', 'misses']
     
     Dir.mktmpdir do |dir|
       Dir.chdir dir do
@@ -54,7 +55,16 @@ describe "Unit testing for johnson.merit220.visit1" do
         puts Dir.glob('*')
         @job.onsetsfiles.each do |onsetfile|
           File.exist?(onsetfile).should be_true
+          csvfile = File.basename(onsetfile, '.mat') + '.csv'
+          lines = File.open(csvfile, 'r') {|f| f.readlines }
+          header = lines.first.chomp
+          missing_conditions = []
+          header.split(", ").collect do |output_condition| 
+            missing_conditions << output_condition unless output_conditions.include?(output_condition)
+          end
+          missing_conditions.should be_empty
         end
+        
       end
     end
   end
@@ -62,7 +72,7 @@ describe "Unit testing for johnson.merit220.visit1" do
   it "should raise a script error if neither log files nor mat files are configured." do
     @job.onsetsfiles = nil
     @job.responses = nil
-    lambda { @job.run_first_level_stats }.should raise_error ScriptError, /Condition vectors cannot be created/
+    lambda { @job.create_or_link_onsets_files }.should raise_error ScriptError, /Condition vectors cannot be created/
   end
   
   after(:each) do

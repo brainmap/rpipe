@@ -8,6 +8,6 @@ module DefaultLogger
         eval("#{log} = Log4r::Logger.new('output')")
         eval("#{log}.add Log4r::StdoutOutputter.new(:stdout)")
       end
-    end      
+    end
   end
 end
