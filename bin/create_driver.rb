@@ -74,6 +74,5 @@ def parse_options
   return options
 end
 
-if __FILE__ == $0
-  create!
-end
+# All that for this.
+create!

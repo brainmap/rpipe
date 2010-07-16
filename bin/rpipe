@@ -126,6 +126,5 @@ class FlashFormatter < Log4r::Formatter
   end
 end
 
-if __FILE__ == $0
-  run!
-end
+# All that for this.
+run!
