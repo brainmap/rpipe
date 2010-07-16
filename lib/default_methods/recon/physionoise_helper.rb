@@ -1,3 +1,6 @@
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', '..', '..',  'physionoise/lib')
+require 'physionoise'
+
 module DefaultRecon	
 	# Create Physionoise Regressors for Inclusion in GLM
 	def create_physiosnoise_regressors(scan_spec)

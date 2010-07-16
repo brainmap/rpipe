@@ -1,10 +1,7 @@
-$LOAD_PATH.unshift File.join(File.dirname(__FILE__), '..', '..', '..',  'physionoise/lib')
-
 require 'metamri/core_additions'
-require 'physionoise'
 require 'pathname'
-require 'default_methods/recon/physionoise_helper'
 require 'default_methods/recon/raw_sequence'
+# require 'default_methods/recon/physionoise_helper'
 
 module DefaultRecon
 	
