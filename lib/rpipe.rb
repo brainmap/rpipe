@@ -23,7 +23,7 @@ class JobStep
 	
 	COLLISION_POLICY = :panic # options -- :panic, :destroy, :overwrite
 	
-	attr_accessor :subid, :rawdir, :origdir, :procdir, :statsdir, :spmdir, :collision_policy, :libdir
+	attr_accessor :subid, :rawdir, :origdir, :procdir, :statsdir, :spmdir, :collision_policy, :libdir, :step
 	
 	# Intialize with two configuration option hashes - workflow_spec and job_spec
 	def initialize(workflow_spec, job_spec)
@@ -37,6 +37,7 @@ class JobStep
 		@scans        = job_spec['scans']       || workflow_spec['scans']
 		@scan_labels  = job_spec['scan_labels'] || workflow_spec['scan_labels'] 
 		@collision_policy = (job_spec['collision'] || workflow_spec['collision'] || COLLISION_POLICY).to_sym
+		@step   = job_spec['step']
 		@method = job_spec['method']
 		include_custom_methods(@method)
 		@libdir = File.dirname(Pathname.new(__FILE__).realpath)
@@ -49,8 +50,24 @@ class JobStep
 		if module_name.nil? or ['default','wadrc'].include?(module_name)
 			# do nothing, use default implementation
 		else
-			require module_name
-			extend self.class.const_get(module_name.dot_camelize)
+      # Search the load path and require a file named after the custom method.
+      # Include methods contained in the custom method module.  
+		  # Ensure it's named properly according to file convention or it won't be correctly included.
+			begin 
+  			require module_name
+		    extend self.class.const_get(module_name.dot_camelize)
+			rescue LoadError => e
+			  puts "Unable to find the specified method #{module_name}"
+			  puts "Please either use a standard preprocessing step or put a method in app/methods/#{module_name}.rb"
+			  puts "Looking in: #{$LOAD_PATH.join(":")}"
+			  raise e
+	    rescue NameError => e
+	      $Log.error "Unable to include a module #{module_name.dot_camelize} (for custom #{@step} step)."
+	      puts "Please check app/methods/#{module_name}.rb and ensure that you declared a module named _exactly_ #{module_name.dot_camelize}."
+	      puts
+	      raise e
+      end
+
 		end
 	end
 	
@@ -221,6 +238,7 @@ class RPipe
 		# the configuration.  
 		@workflow_spec = driver.kind_of?(Hash) ? driver : read_driver_file(driver)
 		
+    # lib/default_logger.rb
     setup_logger
     
     jobs = @workflow_spec['jobs']
@@ -239,6 +257,13 @@ class RPipe
 	# Reads a YAML driver file, parses it with ERB and returns the Configuration Hash.
 	# Raises an error if the file is not found in the file system.
 	def read_driver_file(driver_file)
+		# Add Application Config files to the path if they are present.
+		application_directory = File.expand_path(File.join(File.dirname(driver_file), '..'))
+		%w( matlab methods jobs ).each do |directory|
+		  code_dir = File.join(application_directory, directory)
+	    $LOAD_PATH.unshift(code_dir) if File.directory?(code_dir)
+    end
+		
 		raise(IOError, "Driver file not found: #{driver_file}") unless File.exist?(driver_file)
 		YAML.load(ERB.new(File.read(driver_file)).result) 
   end
