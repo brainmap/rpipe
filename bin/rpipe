@@ -71,7 +71,7 @@ def setup_options
 
   Trollop::die "Driver file not given" if (ARGV.size < 1)
   driver = ARGV.shift
-  Trollop::die :driver, "file does not exist" unless File.exist?(driver)
+  Trollop::die "Driver file #{driver} does not exist.  Check the path to that file and try again" unless File.exist?(driver)
 
   pp opts if opts[:debug]
   
@@ -80,9 +80,10 @@ end
 
 # Setup Tee IO's for Out and Error and start logs for them.
 def run_with_logging(logfile_stem, &block)
-  out_logfile     = logfile_stem + '.out'
-  error_logfile   = logfile_stem + '.err'
-  command_logfile = logfile_stem + '.log'
+  log_dir = File.directory?('log') ? 'log' : '.'
+  out_logfile     = File.join(log_dir, logfile_stem + '.out')
+  error_logfile   = File.join(log_dir, logfile_stem + '.err')
+  command_logfile = File.join(log_dir, logfile_stem + '.log')
   
   teeout = Tee.new(out_logfile, :out)
   teeerr = Tee.new(error_logfile, :err)
