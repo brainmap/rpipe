@@ -76,12 +76,12 @@ class Logfile
   def write_mat(prefix)
     queue = MatlabQueue.new    
     queue.paths << [
-      Pathname.new(File.join(File.dirname(__FILE__), 'matlab_helpers'))
+      Pathname.new(File.join(File.dirname(__FILE__), 'matlab_helpers')).realpath
     ]
     
     raise ScriptError, "Can't find #{@csv_filename}" unless File.exist?(@csv_filename)
 
-    queue << "prepare_onsets_xls( \
+    queue << "prepare_onsets( \
       '#{@csv_filename}', \
       '#{prefix}', \
       { #{@conditions.collect {|c| "'#{c}'"}.join(' ') } } \

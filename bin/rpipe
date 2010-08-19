@@ -5,6 +5,7 @@ begin
   require 'trollop'
   require 'output_catcher'
   require 'pp'
+  require 'etc'
   require 'log4r'
 rescue LoadError
   require 'rubygems'
@@ -25,7 +26,7 @@ EOS
 def run!
   options, driver = setup_options
   run_with_logging File.basename(driver, File.extname(driver)) do  
-    $Log.info "Begin Pipelining #{driver}"
+    $Log.info "Begin Pipelining #{driver} | #{Etc.getlogin} on #{`hostname`}"
     run_pipe(options, driver)
     $Log.info "Finished Pipelining #{driver}"
   end
@@ -85,8 +86,8 @@ def run_with_logging(logfile_stem, &block)
   error_logfile   = File.join(log_dir, logfile_stem + '.err')
   command_logfile = File.join(log_dir, logfile_stem + '.log')
   
-  teeout = Tee.new(out_logfile, :out)
-  teeerr = Tee.new(error_logfile, :err)
+  teeout = Tee.new(out_logfile, :out, 'a')
+  teeerr = Tee.new(error_logfile, :err, 'a')
   
   setup_logger(command_logfile, teeout)
   
@@ -108,7 +109,7 @@ def setup_logger(command_logfile, tee)
 
   File.delete command_logfile if File.exist? command_logfile
   $CommandLog = Log4r::Logger.new('command::output')
-  $CommandLog.add Log4r::FileOutputter.new(:file, :filename => command_logfile, :formatter => Log4r::PatternFormatter.new(:pattern => "%m"))
+  $CommandLog.add Log4r::FileOutputter.new(:file, :filename => command_logfile, :trunc => false, :formatter => Log4r::PatternFormatter.new(:pattern => "%m"))
   $CommandLog.add Log4r::IOOutputter.new(:stdout, tee, :formatter => FlashFormatter.new)
 end
 

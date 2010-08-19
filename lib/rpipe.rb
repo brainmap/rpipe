@@ -22,6 +22,7 @@ require 'global_additions'
 class JobStep
 	
 	COLLISION_POLICY = :panic # options -- :panic, :destroy, :overwrite
+	SPMDIR = '/Applications/spm/spm8/spm8_current'
 	
 	attr_accessor :subid, :rawdir, :origdir, :procdir, :statsdir, :spmdir, :collision_policy, :libdir, :step
 	
@@ -33,7 +34,7 @@ class JobStep
 		@origdir      = job_spec['origdir']     || workflow_spec['origdir']
 		@procdir      = job_spec['procdir']     || workflow_spec['procdir']
 		@statsdir     = job_spec['statsdir']    || workflow_spec['statsdir']
-		@spmdir       = job_spec['spmdir']      || workflow_spec['spmdir']
+		@spmdir       = job_spec['spmdir']      || workflow_spec['spmdir'] || SPMDIR
 		@scans        = job_spec['scans']       || workflow_spec['scans']
 		@scan_labels  = job_spec['scan_labels'] || workflow_spec['scan_labels'] 
 		@collision_policy = (job_spec['collision'] || workflow_spec['collision'] || COLLISION_POLICY).to_sym
@@ -114,6 +115,12 @@ class JobStep
     unless undefined_vars.size == 0
       yield undefined_vars
     end
+  end
+  
+  def validate_existence_of(*args)
+    missing_files = []
+    args.flatten.collect { |file| missing_files << file unless File.exist?(file) }
+    raise ScriptError, "Missing files: #{missing_files.join(", ")}" unless missing_files.empty?
   end
   
 
@@ -247,25 +254,29 @@ class RPipe
 			@preproc_jobs << Preprocessing.new(@workflow_spec, job_params)  if job_params['step'] == 'preprocess'
 			@stats_jobs   << Stats.new(@workflow_spec, job_params)          if job_params['step'] == 'stats'
 		end
-		
-		def jobs
-		  [@recon_jobs, @preproc_jobs, @stats_jobs].flatten
-	  end
-	  
 	end
+		
+	def jobs
+	  [@recon_jobs, @preproc_jobs, @stats_jobs].flatten
+  end
 	
 	# Reads a YAML driver file, parses it with ERB and returns the Configuration Hash.
 	# Raises an error if the file is not found in the file system.
 	def read_driver_file(driver_file)
+	  @matlab_paths = []
 		# Add Application Config files to the path if they are present.
 		application_directory = File.expand_path(File.join(File.dirname(driver_file), '..'))
 		%w( matlab methods jobs ).each do |directory|
 		  code_dir = File.join(application_directory, directory)
-	    $LOAD_PATH.unshift(code_dir) if File.directory?(code_dir)
+	    if File.directory?(code_dir)
+	      $LOAD_PATH.unshift(code_dir) 
+	      p = ENV['MATLABPATH'].split(":") << code_dir
+	      ENV['MATLABPATH'] = p.join(":")
+      end
     end
 		
 		raise(IOError, "Driver file not found: #{driver_file}") unless File.exist?(driver_file)
-		YAML.load(ERB.new(File.read(driver_file)).result) 
+		YAML.load(ERB.new(File.read(driver_file)).result)
   end
   
   private

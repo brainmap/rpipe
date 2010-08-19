@@ -25,12 +25,15 @@ module JohnsonMerit220Visit1Preproc
 	
 	def run_preproc_mfile
 	  raise ScriptError, "Can't find any slice-time corrected images in #{@origdir}" if image_files.empty?
+
+	  validate_existence_of @image_files
+
 	  queue = MatlabQueue.new
-	  queue.paths << ['/Applications/spm/spm8/spm8_current',
-	    '/apps/spm/spm8_current',
-      File.join(@libdir, 'custom_methods'), 
-      File.join(@libdir, 'matlab_helpers')
-    ]
+	  queue.paths << [
+	    File.join(@spmdir, 'config'),
+	    File.join(@spmdir, 'matlabbatch'),
+	    File.expand_path(File.join(@libdir, 'custom_methods')), 
+      File.expand_path(File.join(@libdir, 'matlab_helpers')) ]
 
 	  queue << "JohnsonMerit220Visit1Preproc('#{@procdir}/', \
     { #{image_files.collect {|im| "'#{File.basename(im)}'"}.join(' ')} },  \

@@ -15,13 +15,11 @@ class MatlabQueue
   end
   
   def to_s
-    [
-      @paths.flatten.collect {|path| "addpath(genpath('#{path}'))"},
-      @commands
-    ].flatten.join('; ')
+    @commands.flatten.join('; ')
   end
   
   def run!
+    set_matlabpath
     cmd = @ml_command + " -r \"#{ to_s }; exit\" "
     @success = run(cmd)
   end
@@ -30,8 +28,18 @@ class MatlabQueue
     @commands.send(m, *args, &block)
   end
   
+  # Add paths that should be available for Matlab scripts.
   def add_to_path(*args)
     args.each { |arg| @paths << arg }
+  end
+  
+  private 
+  
+  # Ensure all the paths from #MatlabQueue @paths instance var are present. 
+  def set_matlabpath
+    mlpath = ENV['MATLABPATH'].split(":")
+    @paths.flatten.collect { |path| mlpath << path }
+    puts ENV['MATLABPATH'] = mlpath.uniq.join(":")
   end
   
 end

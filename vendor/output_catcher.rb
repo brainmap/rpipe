@@ -77,7 +77,7 @@ class Tee < IO
   
   def initialize(filename, post = :out, mode_string = 'w')
     super(FILE_DESC[post], mode_string)
-    @file = File.open(filename, 'w')
+    @file = File.open(filename, mode_string)
     eval("$std#{post} = self")
   end
   

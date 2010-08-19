@@ -44,10 +44,11 @@ module JohnsonMerit220Visit1Stats
     raise ScriptError, "Can't find any smoothed, warped images in #{@statsdir}" if images.empty?
     
     queue = MatlabQueue.new
-	  queue.paths << ['/Applications/spm/spm8/spm8_current',
-	    '/apps/spm/spm8_current',
-      File.join(@libdir, 'custom_methods'), 
-      File.join(@libdir, 'matlab_helpers')    ]
+	  queue.paths << [
+	    File.join(@spmdir, 'config'),
+	    File.join(@spmdir, 'matlabbatch'),
+	    File.expand_path(File.join(@libdir, 'custom_methods')), 
+      File.expand_path(File.join(@libdir, 'matlab_helpers')) ]
 
 	  queue << "#{@method}('#{@statsdir}/', \
     { #{images.collect {|im| "'#{File.basename(im)}'"}.join(' ')} }, \

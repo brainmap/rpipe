@@ -1,5 +1,4 @@
-function [] = prepare_onsets ...
-(csvfile, matfileprefix, conditions)
+function [] = prepare_onsets(csvfile, matfileprefix, conditions)
 %IMPORTFILE(FILETOREAD1)
 %  Imports data from the specified file
 %  FILETOREAD1:  file to read
@@ -7,6 +6,8 @@ function [] = prepare_onsets ...
 try
 	import_csv(csvfile);
 catch exception
+	% Since this is running in a script, catch errors and force Matlab to exit
+	% instead of hanging.  (Not exactly elegant, but it works.)
 	['Error Importing CSV' exception.identifier]
 	exit
 end
