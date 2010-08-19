@@ -1,9 +1,15 @@
-function [] = prepare_onsets_xls(csvfile, matfileprefix, conditions)
+function [] = prepare_onsets ...
+(csvfile, matfileprefix, conditions)
 %IMPORTFILE(FILETOREAD1)
 %  Imports data from the specified file
 %  FILETOREAD1:  file to read
 
-import_csv(csvfile);
+try
+	import_csv(csvfile);
+catch exception
+	['Error Importing CSV' exception.identifier]
+	exit
+end
 
 for i = 1:length(conditions)
 	condition = conditions{i};
