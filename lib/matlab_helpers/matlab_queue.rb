@@ -15,12 +15,12 @@ class MatlabQueue
   end
   
   def to_s
-    @commands.flatten.join('; ')
+    @commands.flatten.join(', ')
   end
   
   def run!
     set_matlabpath
-    cmd = @ml_command + " -r \"#{ to_s }; exit\" "
+    cmd = @ml_command + " -r \"#{ escape_error(to_s) }, exit\" "
     @success = run(cmd)
   end
   
@@ -39,7 +39,11 @@ class MatlabQueue
   def set_matlabpath
     mlpath = ENV['MATLABPATH'].split(":")
     @paths.flatten.collect { |path| mlpath << path }
-    puts ENV['MATLABPATH'] = mlpath.uniq.join(":")
+    $Log.debug ENV['MATLABPATH'] = mlpath.uniq.join(":")
+  end
+  
+  def escape_error(command)
+    "try; #{command}; catch exception; display(getReport(exception)); pause(1); end"
   end
   
 end

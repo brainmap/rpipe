@@ -25,7 +25,7 @@ EOS
 # Main Function for the CLI runner.
 def run!
   options, driver = setup_options
-  run_with_logging File.basename(driver, File.extname(driver)) do  
+  run_with_logging File.basename(driver, File.extname(driver)), options do  
     $Log.info "Begin Pipelining #{driver} | #{Etc.getlogin} on #{`hostname`}"
     run_pipe(options, driver)
     $Log.info "Finished Pipelining #{driver}"
@@ -80,7 +80,7 @@ def setup_options
 end
 
 # Setup Tee IO's for Out and Error and start logs for them.
-def run_with_logging(logfile_stem, &block)
+def run_with_logging(logfile_stem, options, &block)
   log_dir = File.directory?('log') ? 'log' : '.'
   out_logfile     = File.join(log_dir, logfile_stem + '.out')
   error_logfile   = File.join(log_dir, logfile_stem + '.err')
@@ -89,7 +89,7 @@ def run_with_logging(logfile_stem, &block)
   teeout = Tee.new(out_logfile, :out, 'a')
   teeerr = Tee.new(error_logfile, :err, 'a')
   
-  setup_logger(command_logfile, teeout)
+  setup_logger(command_logfile, teeout, options)
   
   begin
     yield
@@ -102,9 +102,10 @@ def run_with_logging(logfile_stem, &block)
 end
 
 # Log Commands to a file and Output to stdout
-def setup_logger(command_logfile, tee)
+def setup_logger(command_logfile, tee, options)
   console_pattern = "#{'*' * 10} %m [ %d ]"
   $Log = Log4r::Logger.new('output')
+  $Log.level = Log4r::DEBUG
   $Log.add Log4r::IOOutputter.new(:stdout, tee, :formatter => FlashFormatter.new)
 
   File.delete command_logfile if File.exist? command_logfile

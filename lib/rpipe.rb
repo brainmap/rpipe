@@ -22,7 +22,6 @@ require 'global_additions'
 class JobStep
 	
 	COLLISION_POLICY = :panic # options -- :panic, :destroy, :overwrite
-	SPMDIR = '/Applications/spm/spm8/spm8_current'
 	
 	attr_accessor :subid, :rawdir, :origdir, :procdir, :statsdir, :spmdir, :collision_policy, :libdir, :step
 	
@@ -34,7 +33,7 @@ class JobStep
 		@origdir      = job_spec['origdir']     || workflow_spec['origdir']
 		@procdir      = job_spec['procdir']     || workflow_spec['procdir']
 		@statsdir     = job_spec['statsdir']    || workflow_spec['statsdir']
-		@spmdir       = job_spec['spmdir']      || workflow_spec['spmdir'] || SPMDIR
+		@spmdir       = job_spec['spmdir']      || workflow_spec['spmdir'] || default_spmdir
 		@scans        = job_spec['scans']       || workflow_spec['scans']
 		@scan_labels  = job_spec['scan_labels'] || workflow_spec['scan_labels'] 
 		@collision_policy = (job_spec['collision'] || workflow_spec['collision'] || COLLISION_POLICY).to_sym
@@ -96,7 +95,7 @@ class JobStep
       error = "
       Warning: Misconfiguration detected.
       You are missing the following required variables from your spec file:
-      #{missing_vars.collect { |var| "  - #{var} \n" } }
+      #{missing_vars.collect { |var| "\t  - #{var} \n" } }
       "
       
       puts error
@@ -123,6 +122,13 @@ class JobStep
     raise ScriptError, "Missing files: #{missing_files.join(", ")}" unless missing_files.empty?
   end
   
+  def default_spmdir
+    spmdirs = %w{/Applications/spm/spm8/spm8_current /apps/spm/spm8_current}
+    spmdirs.each do |dir|
+      return dir if File.directory? dir
+    end
+    raise IOError, "Couldn't find default SPM directory in #{spmdirs.join("; ")}."
+  end
 
   	
 end
