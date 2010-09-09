@@ -51,10 +51,14 @@ class StatsJobGenerator < JobGenerator
   
   def logfiles
     return @logfiles if @logfiles
-    logfiles = Dir.glob(File.join(@responses['directory'], @config['subid'] + "*.txt"))
-    raise IOError, "No logfiles found in #{@responses['directory']} matching #{@config['subid']}" if logfiles.empty?
-    logfiles = logfiles.collect! {|file| Logfile.new(file)}.sort
-    @logfiles = logfiles.collect! {|file| File.basename(file.textfile) }
+    if @responses['directory']
+      logfiles = Dir.glob(File.join(@responses['directory'], @config['subid'] + "*.txt"))
+      raise IOError, "No logfiles found in #{@responses['directory']} matching #{@config['subid']}" if logfiles.empty?
+      logfiles = logfiles.collect! {|file| Logfile.new(file)}.sort
+      @logfiles = logfiles.collect! {|file| File.basename(file.textfile) }
+    else
+      puts "Warning: No responses specified."
+    end
   end
   
   def regressorsfiles

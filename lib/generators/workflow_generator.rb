@@ -31,7 +31,7 @@ class WorkflowGenerator < JobGenerator
     @spec['subid'] = parse_subid
     @spec['study_procedure'] = @config['study_procedure'] ||= guess_study_procedure_from(@rawdir)
 
-    config_requires 'responses_dir'
+    # config_requires 'responses_dir'
   end
   
   # Create and return a workflow spec to drive processing
