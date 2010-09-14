@@ -81,7 +81,7 @@ module DefaultRecon
       epirecon_cmd_format = "epirecon_ex -f %s -NAME %s -skip %d -scltype=0"
       epirecon_cmd_options = [@pfile_data, outfile, volumes_to_skip]
       epirecon_cmd = epirecon_cmd_format % epirecon_cmd_options
-      raise ScriptError, "Problem running #{epirecon_cmd}" unless run(epirecon_cmd)
+			raise ScriptError, "Problem running #{epirecon_cmd}" unless run(epirecon_cmd)
     end
     
     alias_method :prepare, :reconstruct_sequence
@@ -99,11 +99,13 @@ module DefaultRecon
     # Create a new unzipped local copy of the ref.dat file and link it into 
     # pwd for reconstruction.
     def setup_refdat(refdat_stem)
-      base_refdat_path = File.join(@rawdir, refdat_stem)
+      $Log.debug "Using refdat file: #{refdat_stem}"
+			base_refdat_path = File.join(@rawdir, refdat_stem)
       refdat_path = File.exist?(base_refdat_path) ? base_refdat_path : base_refdat_path + ".bz2"
       raise IOError, "#{refdat_path} does not exist." unless File.exist?(refdat_path)
       local_refdat_file = Pathname.new(refdat_path).local_copy
-      FileUtils.ln_s(local_refdat_file, Dir.pwd, :force => true)
+			# epirecon expects a reference named _exactly_ ref.dat, so that's what the link should be named.
+      FileUtils.ln_s(local_refdat_file, File.join(Dir.pwd, 'ref.dat'), :force => true)
     end    
    end
 end
