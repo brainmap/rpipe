@@ -212,7 +212,8 @@ class Stats < JobStep
 		@bold_reps = stats_spec['bold_reps']
 		@conditions = stats_spec['conditions'] || workflow_spec['conditions']
 		
-		job_requires 'bold_reps', 'conditions', 'procdir'
+		job_requires 'bold_reps', 'procdir', 'statsdir'
+		job_requires 'conditions' if @responses
 	end
 	
 end

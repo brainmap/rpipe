@@ -46,6 +46,7 @@ module DefaultStats
 	# Finally runs the stats job and writes output to current working directory.
 	def run_stats_spm_job
 		# TODO
+		# These are mostly being implemented in custom methods.
 	end
 	
 	# Create onsets files using logfile responses for given conditions.

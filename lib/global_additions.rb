@@ -6,7 +6,7 @@ def run(command)
   
   status = POpen4::popen4(command) do |stdout, stderr|
     puts stdout.read.strip
-    puts stderr.read.strip
+    $Log.error stderr.read.strip
   end
       
   status && status.exitstatus == 0 ? true : false

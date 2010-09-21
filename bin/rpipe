@@ -62,6 +62,7 @@ def setup_options
   	banner BANNER
   	opt :only, "Perform only a certain step (recon, preproc, stats)", :type => String
   	opt :debug, "Be more wordy than usual for debugging"
+  	opt :log_directory, "Output Directory for processing logs.", :type => String
   end
 
   if opts[:only_given]
@@ -81,18 +82,27 @@ end
 
 # Setup Tee IO's for Out and Error and start logs for them.
 def run_with_logging(logfile_stem, options, &block)
-  log_dir = File.directory?('log') ? 'log' : '.'
+  if options[:log_directory]
+    log_dir = options[:log_directory]
+  else 
+    # If no explicit directory has been passed as an argument, check to see if
+    # a directory named "logs" exists.  If so, use that, otherwise use the current directory.
+    log_dir = File.directory?('logs') ? 'logs' : '.'
+  end
   out_logfile     = File.join(log_dir, logfile_stem + '.out')
   error_logfile   = File.join(log_dir, logfile_stem + '.err')
-  command_logfile = File.join(log_dir, logfile_stem + '.log')
+  command_logfile = File.join(log_dir, logfile_stem + '.sh')
   
   teeout = Tee.new(out_logfile, :out, 'a')
   teeerr = Tee.new(error_logfile, :err, 'a')
   
-  setup_logger(command_logfile, teeout, options)
+  setup_logger(command_logfile, teeout, teeerr, options)
   
   begin
     yield
+  rescue Exception => e
+    $ErrorLog.error e
+    raise e
   ensure
     # Discard the error log if there were no errors.
     # Size returns nil for an empty file.
@@ -102,16 +112,19 @@ def run_with_logging(logfile_stem, options, &block)
 end
 
 # Log Commands to a file and Output to stdout
-def setup_logger(command_logfile, tee, options)
+def setup_logger(command_logfile, teeout, teeerr, options)
   console_pattern = "#{'*' * 10} %m [ %d ]"
   $Log = Log4r::Logger.new('output')
   $Log.level = Log4r::DEBUG
-  $Log.add Log4r::IOOutputter.new(:stdout, tee, :formatter => FlashFormatter.new)
+  $Log.add Log4r::IOOutputter.new(:stdout, teeout, :formatter => FlashFormatter.new)
 
   File.delete command_logfile if File.exist? command_logfile
   $CommandLog = Log4r::Logger.new('command::output')
   $CommandLog.add Log4r::FileOutputter.new(:file, :filename => command_logfile, :trunc => false, :formatter => Log4r::PatternFormatter.new(:pattern => "%m"))
-  $CommandLog.add Log4r::IOOutputter.new(:stdout, tee, :formatter => FlashFormatter.new)
+  $CommandLog.add Log4r::IOOutputter.new(:stdout, teeout, :formatter => FlashFormatter.new)
+  
+  $ErrorLog = Log4r::Logger.new('error::output')
+  $ErrorLog.add Log4r::IOOutputter.new(:stderr, teeerr, :formatter => Log4r::PatternFormatter.new(:pattern => "%m"))
 end
 
 
