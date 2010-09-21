@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rpipe}
-  s.version = "0.0.3"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kristopher Kosmatka", "Erik Kastman"]
-  s.date = %q{2010-07-16}
+  s.date = %q{2010-09-21}
   s.description = %q{Neuroimaging preprocessing the Ruby way}
   s.email = %q{kjkosmatka@gmail.com}
   s.executables = ["rpipe", "swallow_batch_run.rb", "create_driver.rb"]
@@ -59,7 +59,7 @@ Gem::Specification.new do |s|
      "lib/matlab_helpers/CreateFunctionalVolumeStruct.m",
      "lib/matlab_helpers/import_csv.m",
      "lib/matlab_helpers/matlab_queue.rb",
-     "lib/matlab_helpers/prepare_onsets_xls.m",
+     "lib/matlab_helpers/prepare_onsets.m",
      "lib/rpipe.rb",
      "rpipe.gemspec",
      "spec/generators/preproc_job_generator_spec.rb",
@@ -126,7 +126,7 @@ Gem::Specification.new do |s|
   s.homepage = %q{http://github.com/brainmap/rpipe}
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
+  s.rubygems_version = %q{1.3.6}
   s.summary = %q{Neuroimaging preprocessing the Ruby way}
   s.test_files = [
     "spec/generators/preproc_job_generator_spec.rb",
@@ -153,7 +153,7 @@ Gem::Specification.new do |s|
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_development_dependency(%q<thoughtbot-shoulda>, [">= 0"])
       s.add_runtime_dependency(%q<metamri>, [">= 0"])
       s.add_runtime_dependency(%q<log4r>, [">= 0"])
