@@ -16,7 +16,7 @@ describe "Test Matlab Queue Operations" do
     @q.commands << "2 + 3"
     @q.length.should equal 2
     
-    @q.to_s.should == "1 + 2; 2 + 3"
+    @q.to_s.should == "1 + 2, 2 + 3"
   end
   
   it "should add to the path" do
@@ -28,7 +28,7 @@ describe "Test Matlab Queue Operations" do
   it "should generate a good string with paths and commands" do
     @q.paths << File.dirname(__FILE__)
     @q.commands << "1 + 2"
-    @q.to_s.should == "addpath(genpath('#{File.dirname(__FILE__)}')); 1 + 2"
+    @q.to_s.should == "1 + 2"
   end
   
   it "should run matlab successfully." do

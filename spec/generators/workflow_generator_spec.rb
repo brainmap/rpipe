@@ -20,7 +20,7 @@ describe "Workflow Generator" do
       "conditions"=> ["new_correct", "new_incorrect", "old_correct", "old_incorrect"],
       "regressorsfiles"=> ["rp_amrt00000_EPI-fMRI-Task1.txt", "rp_amrt00000_EPI-fMRI-Task2.txt"],
       "bold_reps"=>[164, 164],
-      "method" => "Merit220Stats"
+      "method" => "JohnsonMerit220Visit1Stats"
     }
     
     

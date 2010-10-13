@@ -118,7 +118,6 @@ def setup_logger(command_logfile, teeout, teeerr, options)
   $Log.level = Log4r::DEBUG
   $Log.add Log4r::IOOutputter.new(:stdout, teeout, :formatter => FlashFormatter.new)
 
-  File.delete command_logfile if File.exist? command_logfile
   $CommandLog = Log4r::Logger.new('command::output')
   $CommandLog.add Log4r::FileOutputter.new(:file, :filename => command_logfile, :trunc => false, :formatter => Log4r::PatternFormatter.new(:pattern => "%m"))
   $CommandLog.add Log4r::IOOutputter.new(:stdout, teeout, :formatter => FlashFormatter.new)

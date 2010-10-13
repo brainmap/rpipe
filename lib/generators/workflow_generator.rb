@@ -18,7 +18,7 @@ require 'generators/stats_job_generator'
 #  - statsdir : A directory where stats will be saved.  (This should be a final directory.)
 
 class WorkflowGenerator < JobGenerator
-  attr_reader :spec
+  attr_reader :spec, :config
   
   def initialize(rawdir, config = Hash.new)
     config_defaults = {}
@@ -81,9 +81,15 @@ class WorkflowGenerator < JobGenerator
   # Handle Directory Configuration and Defaults for orig, proc and stats dirs.
   def configure_directories
     processing_dir = @config['processing_dir']
-    @spec['origdir']  = @config['origdir']  || parse_directory_format(@config['directory_formats']['origdir'])  || File.join(processing_dir, @spec['subid'] + '_orig')
-    @spec['procdir']  = @config['procdir']  || parse_directory_format(@config['directory_formats']['procdir'])  || File.join(processing_dir, @spec['subid'] + '_proc')
-    @spec['statsdir'] = @config['statsdir'] || parse_directory_format(@config['directory_formats']['statsdir']) || File.join(processing_dir, @spec['subid'] + '_stats')
+    if @config['directory_formats']
+      @spec['origdir']  = @config['origdir']  || parse_directory_format(@config['directory_formats']['origdir'])  || File.join(processing_dir, @spec['subid'] + '_orig')
+      @spec['procdir']  = @config['procdir']  || parse_directory_format(@config['directory_formats']['procdir'])  || File.join(processing_dir, @spec['subid'] + '_proc')
+      @spec['statsdir'] = @config['statsdir'] || parse_directory_format(@config['directory_formats']['statsdir']) || File.join(processing_dir, @spec['subid'] + '_stats')
+    else
+      @spec['origdir']  = @config['origdir']  || File.join(processing_dir, @spec['subid'] + '_orig')
+      @spec['procdir']  = @config['procdir']  || File.join(processing_dir, @spec['subid'] + '_proc')
+      @spec['statsdir'] = @config['statsdir'] || File.join(processing_dir, @spec['subid'] + '_stats')
+    end
   end
   
   # Replace a directory format string with respective values from the spec.

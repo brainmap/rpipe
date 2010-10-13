@@ -55,40 +55,40 @@ describe "Test Phyiosnoise" do
 	  
   end
 	  
-  it "should create physionoise regressors from Cardiac and Respiration Data" do
-    Dir.chdir @recon_job.origdir do
-      @recon_job.create_physiosnoise_regressors(@scan_spec)
-    end
-      
-    Dir.compare_directories(@recon_job.origdir, @physionoise_fixture_dir).should be_true    
+  it "should create physionoise regressors from Cardiac and Respiration Data" # do
+    # Dir.chdir @recon_job.origdir do
+    #   @recon_job.create_physiosnoise_regressors(@scan_spec)
+    # end
+    #   
+    # Dir.compare_directories(@recon_job.origdir, @physionoise_fixture_dir).should be_true    
 
-  end
+  # end
   
-  it "should correctly build a spec for passing to physionoise" do
-    @recon_job.build_physionoise_run_spec(@scan_spec).should == @valid_physionoise_run_spec
-  end
+  it "should correctly build a spec for passing to physionoise" # do
+    # @recon_job.build_physionoise_run_spec(@scan_spec).should == @valid_physionoise_run_spec
+  # end
   
-  it "should correctly build a physionoise python command" do
-      @valid_physionoise_run_spec.each do |run|
-        puts Physionoise.build_run_cmd(run)
-      end
-  end
+  it "should correctly build a physionoise python command" # do
+      # @valid_physionoise_run_spec.each do |run|
+      #   puts Physionoise.build_run_cmd(run)
+      # end
+  # end
   
-  it "should build a 3dRetroicor string" do
-    valid_cmd = "3dretroicor -prefix ptask1.nii -card #{@runs_dir}/../cardiac/PPGData_epiRT_0211201009_21_22_80 -resp #{@runs_dir}/../cardiac/RESPData_epiRT_0211201009_21_22_80 task1.nii"
-    valid_outfile = "p#{@scan_spec['label']}.nii"
-    test_cmd, test_outfile = @recon_job.build_retroicor_cmd(@scan_spec['physio_files'], "#{@scan_spec['label']}.nii")
-    
-    valid_cmd.should == test_cmd
-    valid_outfile.should == test_outfile
-  end
+  it "should build a 3dRetroicor string" # do
+    # valid_cmd = "3dretroicor -prefix ptask1.nii -card #{@runs_dir}/../cardiac/PPGData_epiRT_0211201009_21_22_80 -resp #{@runs_dir}/../cardiac/RESPData_epiRT_0211201009_21_22_80 task1.nii"
+    # valid_outfile = "p#{@scan_spec['label']}.nii"
+    # test_cmd, test_outfile = @recon_job.build_retroicor_cmd(@scan_spec['physio_files'], "#{@scan_spec['label']}.nii")
+    # 
+    # valid_cmd.should == test_cmd
+    # valid_outfile.should == test_outfile
+  # end
   
-  it "should raise an error building a 3dRetroicor string if improperly configured" do
-    physio_files = @scan_spec['physio_files']
-    physio_files.delete(:cardiac_signal)
-    
-    lambda {@recon_job.build_retroicor_cmd(physio_files, "#{@scan_spec['label']}.nii") }.should raise_error ScriptError, /Missing .* cardiac/
-  end
+  it "should raise an error building a 3dRetroicor string if improperly configured" # do
+    # physio_files = @scan_spec['physio_files']
+    # physio_files.delete(:cardiac_signal)
+    # 
+    # lambda {@recon_job.build_retroicor_cmd(physio_files, "#{@scan_spec['label']}.nii") }.should raise_error ScriptError, /Missing .* cardiac/
+  # end
   
   it "should raise an IOError building a 3dRetroicor string with bad files"
 

@@ -30,6 +30,7 @@ module JohnsonMerit220Visit1Preproc
 
 	  queue = MatlabQueue.new
 	  queue.paths << [
+	    @spmdir,
 	    File.join(@spmdir, 'config'),
 	    File.join(@spmdir, 'matlabbatch'),
 	    File.expand_path(File.join(@libdir, 'custom_methods')), 

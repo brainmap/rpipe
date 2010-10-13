@@ -67,8 +67,14 @@ module DefaultStats
 	  onsets_mat_files = []
 	  wd = Dir.pwd
 	  matching_directories = Dir.glob(responses['directory'])
-	  raise IOError, "Response directory #{responses['directory']} doesn't exist." unless File.directory?(responses['directory'])
-	  raise IOError, "Only one response directory currently accepted (matched directories: #{matching_directories.join(', ')})" unless matching_directories.length == 1
+
+	  case 
+	  when matching_directories.length == 0
+	    raise(IOError, "Response directory #{responses['directory']} doesn't exist or isn't mounted.")
+	  when matching_directories.length > 1
+	    raise IOError, "Only one response directory currently accepted (matched directories: #{matching_directories.join(', ')})"
+    end
+	  
 	  Dir.chdir matching_directories.first  do
 	    responses['logfiles'].each do |logfile|
   	    # Either Strip off the prefix directly without changing the name...
