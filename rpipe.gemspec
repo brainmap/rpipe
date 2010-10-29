@@ -5,14 +5,14 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rpipe}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kristopher Kosmatka", "Erik Kastman"]
-  s.date = %q{2010-09-21}
+  s.date = %q{2010-10-29}
   s.description = %q{Neuroimaging preprocessing the Ruby way}
   s.email = %q{kjkosmatka@gmail.com}
-  s.executables = ["rpipe", "swallow_batch_run.rb", "create_driver.rb"]
+  s.executables = ["swallow_batch_run.rb", "create_driver.rb", "rpipe"]
   s.extra_rdoc_files = [
     "LICENSE",
      "README",
