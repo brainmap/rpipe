@@ -96,7 +96,7 @@ def run_with_logging(logfile_stem, options, &block)
   teeout = Tee.new(out_logfile, :out, 'a')
   teeerr = Tee.new(error_logfile, :err, 'a')
   
-  setup_logger(command_logfile, teeout, teeerr, options)
+  setup_runner_logger(command_logfile, teeout, teeerr, options)
   
   begin
     yield
@@ -112,7 +112,7 @@ def run_with_logging(logfile_stem, options, &block)
 end
 
 # Log Commands to a file and Output to stdout
-def setup_logger(command_logfile, teeout, teeerr, options)
+def setup_runner_logger(command_logfile, teeout, teeerr, options)
   console_pattern = "#{'*' * 10} %m [ %d ]"
   $Log = Log4r::Logger.new('output')
   $Log.level = Log4r::DEBUG

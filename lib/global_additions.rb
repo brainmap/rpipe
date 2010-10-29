@@ -1,4 +1,10 @@
 require 'popen4'
+require 'default_logger'
+include DefaultLogger
+
+unless defined?($Log)
+  DefaultLogger::setup_logger
+end
 
 # Global Method to Log and Run system commands.
 def run(command)

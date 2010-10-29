@@ -1,3 +1,4 @@
+require 'global_additions'
 require 'default_logger'
 
 # Maintain and run matlab commands and paths.
@@ -11,7 +12,7 @@ class MatlabQueue
     @paths = []
     @commands = []
     @ml_command = "matlab -nosplash -nodesktop"
-    setup_logger
+    setup_logger unless defined?($Log)
   end
   
   def to_s
