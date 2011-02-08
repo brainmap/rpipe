@@ -56,10 +56,10 @@ class ReconJobGenerator < JobGenerator
     
     scan['dir']             = dataset.relative_dataset_path
     scan['type']            = 'func'
-    scan['z_slices']        = raw_image_file.num_slices
-    scan['bold_reps']       = raw_image_file.bold_reps
-    scan['volumes_to_skip'] = @config['volumes_to_skip']
-    scan['rep_time']        = raw_image_file.rep_time.in_seconds
+    scan['z_slices']        = raw_image_file.num_slices.to_i
+    scan['bold_reps']       = raw_image_file.bold_reps.to_i
+    scan['volumes_to_skip'] = @config['volumes_to_skip'].to_i
+    scan['rep_time']        = raw_image_file.rep_time.to_f.in_seconds
     scan['label']           = dataset.series_description.escape_filename
     # scan['task']            = '?'
     # scan['physio_files']    = "#TODO"

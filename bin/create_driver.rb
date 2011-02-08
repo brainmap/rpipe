@@ -21,17 +21,28 @@ def create!
   if cli_options[:dry_run]
     pp workflow.build
   else
-    write_file(workflow.build)
+    begin
+      puts write_driver_hash workflow.build, :cli_options => cli_options
+    rescue IOError => e
+      puts e
+    end
   end
 end
 
-
-
-def write_file(workflow_spec, filename = nil)
-  filename ||= workflow_spec['subid'] + '.yaml'
+def write_driver_hash (workflow_spec, driver_options = {:filename => nil})
+  filename = driver_options[:filename] ||= workflow_spec['subid'] + '.yaml'
   
+  if File.exist? filename and ! driver_options[:cli_options][:force]
+    raise IOError, "Driver #{filename} already exists; use -f option to force overwrite." 
+  else
+    write_file(workflow_spec, filename)
+  end
+end
+
+def write_file(workflow_spec, filename)
   File.open(filename, 'w') { |f| f.puts workflow_spec.to_yaml }
   raise IOError, "Couldn't write #{filename}}" unless File.exist?(filename)
+  "Wrote file #{filename}..."
 end
 
 def load_spec(spec_file)
@@ -59,6 +70,10 @@ def parse_options
 
     opts.on('-d', '--dry-run', "Display Driver without executing it.") do
       options[:dry_run] = true
+    end
+    
+    opts.on('-f', '--force', "Overwrite drivers if they exist.") do
+      options[:force] = true
     end
 
     opts.on_tail('-h', '--help', "Show this message")  { puts(parser); exit }
