@@ -154,20 +154,20 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<thoughtbot-shoulda>, [">= 0"])
+      s.add_development_dependency(%q<shoulda>, [">= 0"])
       s.add_runtime_dependency(%q<metamri>, [">= 0"])
       s.add_runtime_dependency(%q<log4r>, [">= 0"])
       s.add_runtime_dependency(%q<POpen4>, [">= 0"])
       s.add_runtime_dependency(%q<ruport>, [">= 0"])
     else
-      s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
+      s.add_dependency(%q<shoulda>, [">= 0"])
       s.add_dependency(%q<metamri>, [">= 0"])
       s.add_dependency(%q<log4r>, [">= 0"])
       s.add_dependency(%q<POpen4>, [">= 0"])
       s.add_dependency(%q<ruport>, [">= 0"])
     end
   else
-    s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
+    s.add_dependency(%q<shoulda>, [">= 0"])
     s.add_dependency(%q<metamri>, [">= 0"])
     s.add_dependency(%q<log4r>, [">= 0"])
     s.add_dependency(%q<POpen4>, [">= 0"])
