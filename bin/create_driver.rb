@@ -65,7 +65,7 @@ def parse_options
     end
     
     opts.on('-r', '--responses_dir RESPONSES_DIR', "Directory containing Button-press Response Logfiles")     do |responses_dir| 
-      options[:config][:responses_dir.to_s] = responses_dir
+      options[:config][:responses_dir.to_s] = File.expand_path(responses_dir)
     end
 
     opts.on('-d', '--dry-run', "Display Driver without executing it.") do
