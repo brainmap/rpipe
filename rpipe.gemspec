@@ -5,14 +5,14 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rpipe}
-  s.version = "0.1.2"
+  s.version = "0.1.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Kristopher Kosmatka", "Erik Kastman"]
-  s.date = %q{2011-03-07}
+  s.date = %q{2011-03-24}
   s.description = %q{Neuroimaging preprocessing the Ruby way}
   s.email = %q{kjkosmatka@gmail.com}
-  s.executables = ["swallow_batch_run.rb", "rpipe", "create_driver.rb"]
+  s.executables = ["swallow_batch_run.rb", "rpipe", "summarize_responses.rb", "create_driver.rb"]
   s.extra_rdoc_files = [
     "LICENSE",
     "README",
@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
     "VERSION",
     "bin/create_driver.rb",
     "bin/rpipe",
+    "bin/summarize_responses.rb",
     "bin/swallow_batch_run.rb",
     "lib/core_additions.rb",
     "lib/custom_methods/JohnsonMerit220Visit1Preproc.m",
@@ -155,6 +156,7 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<rpipe>, [">= 0"])
       s.add_development_dependency(%q<shoulda>, [">= 0"])
       s.add_development_dependency(%q<thoughtbot-shoulda>, [">= 0"])
+      s.add_development_dependency(%q<thoughtbot-shoulda>, [">= 0"])
       s.add_runtime_dependency(%q<metamri>, [">= 0"])
       s.add_runtime_dependency(%q<log4r>, [">= 0"])
       s.add_runtime_dependency(%q<POpen4>, [">= 0"])
@@ -162,6 +164,7 @@ Gem::Specification.new do |s|
     else
       s.add_dependency(%q<rpipe>, [">= 0"])
       s.add_dependency(%q<shoulda>, [">= 0"])
+      s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
       s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
       s.add_dependency(%q<metamri>, [">= 0"])
       s.add_dependency(%q<log4r>, [">= 0"])
@@ -171,6 +174,7 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<rpipe>, [">= 0"])
     s.add_dependency(%q<shoulda>, [">= 0"])
+    s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
     s.add_dependency(%q<thoughtbot-shoulda>, [">= 0"])
     s.add_dependency(%q<metamri>, [">= 0"])
     s.add_dependency(%q<log4r>, [">= 0"])
