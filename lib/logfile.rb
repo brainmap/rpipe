@@ -99,7 +99,14 @@ class Logfile
     File.stat(@textfile).mtime <=> File.stat(other_logfile.textfile).mtime
   end
   
-  def self.write_summary(filename = 'tmp.csv', directory = Dir.pwd, grouping = 'version')
+  def self.write_summary(filename = nil, directory = nil, grouping = nil)
+    # One usage for this method is from the summarize_responses.rb executible,
+    # which doesn't allow for ordered arguments on the fly.  Therefore,
+    # assign defaults within the method itself, not the signature.
+    filename ||= 'tmp.csv'
+    directory ||= Dir.pwd
+    grouping ||= 'version'
+    
     table = self.summarize_directory(directory)
     File.open(filename, 'w') do |f| 
       f.puts Ruport::Data::Grouping(table, :by => grouping).to_csv
