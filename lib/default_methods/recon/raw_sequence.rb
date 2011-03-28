@@ -14,9 +14,9 @@ module DefaultRecon
   class DicomRawSequence < RawSequence
     # Locally copy and unzip a folder of Raw Dicoms and call convert_sequence on them
     def prepare_and_convert_sequence(outfile)
-      scandir = File.join(@rawdir, @scan_spec['dir'])
-      $Log.info "Dicom Reconstruction: #{scandir}"
-      Pathname.new(scandir).all_dicoms do |dicoms|
+      @scandir = File.join(@rawdir, @scan_spec['dir'])
+      $Log.info "Dicom Reconstruction: #{@scandir}"
+      Pathname.new(@scandir).all_dicoms do |dicoms|
         convert_sequence(dicoms, outfile)
       end
     end
@@ -29,14 +29,22 @@ module DefaultRecon
     def convert_sequence(dicoms, outfile)
       local_scandir = File.dirname(dicoms.first)
       second_file = Dir.glob( File.join(local_scandir, "*0002*") )
-      wildcard = File.join(local_scandir, "*.[0-9]*")
+      glob = case second_file
+      when /.*\.\d*/
+        "*.[0-9]*"
+      else 
+        "*.dcm"
+      end
+      wildcard = File.join(local_scandir, glob)
+        
+        
     
       recon_cmd_format = 'to3d -skip_outliers %s -prefix tmp.nii "%s"'
 
       timing_opts = timing_options(@scan_spec, second_file)
 
       unless run(recon_cmd_format % [timing_opts, wildcard])
-        raise(IOError,"Failed to reconstruct scan: #{scandir}")
+        raise(IOError,"Failed to reconstruct scan: #{@scandir}")
       end
     end
   

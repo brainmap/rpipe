@@ -44,7 +44,7 @@ class WorkflowGenerator < JobGenerator
     jobs = []
     
     # Recon
-    recon_options = {'rawdir' => @rawdir, 'epi_pattern' => /(Resting|Task)/i, }
+    recon_options = {'rawdir' => @rawdir, 'epi_pattern' => /(Rest|Task)/i, }
     config_step_method(recon_options, 'recon') if @config['custom_methods']
     jobs << ReconJobGenerator.new(recon_options).build
     
