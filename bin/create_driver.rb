@@ -16,15 +16,21 @@ def create!
   workflow_options = workflow_options_defaults.merge(spec_options).merge(cli_options[:config])
 
   # Create a Workflow Generator and use it to create configure job.
-  rawdir = ARGV.pop
-  workflow = WorkflowGenerator.new(rawdir, workflow_options)
-  if cli_options[:dry_run]
-    pp workflow.build
-  else
+  while ARGV.size > 1
     begin
-      puts write_driver_hash workflow.build, :cli_options => cli_options
-    rescue IOError => e
-      puts e
+      rawdir = ARGV.pop
+      workflow = WorkflowGenerator.new(rawdir, workflow_options)
+      if cli_options[:dry_run]
+        pp workflow.build
+      else
+        begin
+          puts write_driver_hash workflow.build, :cli_options => cli_options
+        rescue IOError => e
+          puts e
+        end
+      end
+    rescue StandardError => e
+      puts "Problem creating driver for #{rawdir}"
     end
   end
 end
@@ -58,7 +64,7 @@ end
 def parse_options
   options = { :config => {} }
   parser = OptionParser.new do |opts|
-    opts.banner = "Usage: #{File.basename(__FILE__)} [options] RAWDIR"
+    opts.banner = "Usage: #{File.basename(__FILE__)} [options] RAWDIR(S)"
 
     opts.on('-s', '--spec SPEC', "Spec File for common study parameters")     do |spec_file| 
       options[:spec_file] = spec_file
@@ -78,6 +84,7 @@ def parse_options
 
     opts.on_tail('-h', '--help', "Show this message")  { puts(parser); exit }
     opts.on_tail("Example: #{File.basename(__FILE__)} mrt00001")
+    opts.on_tail("Example: #{File.basename(__FILE__)} raw/johnson.merit220.visit1/mri/mrt*")
   end
   parser.parse!(ARGV)
 

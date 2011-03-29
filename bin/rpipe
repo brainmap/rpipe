@@ -19,18 +19,22 @@ VERSION_LINE = "rpipe %s WADRC Imaging Core" % VERSION_NUMBER
 BANNER = <<-EOS
 A utility for running neuroimaging rpipe jobs.
 
-Usage: rpipe [options] <driver>
+Usage:\trpipe [options] <driver(s)>
+
 EOS
 
 # Main Function for the CLI runner.
 def run!
-  options, driver = setup_options
-  run_with_logging File.basename(driver, File.extname(driver)), options do  
-    $Log.info "Begin Pipelining #{driver} | #{Etc.getlogin} on #{`hostname`}"
-    run_pipe(options, driver)
-    $Log.info "Finished Pipelining #{driver}"
+  options = setup_options
+  drivers = *ARGV
+  while drivers.size > 1    
+    driver = drivers.pop
+    run_with_logging File.basename(driver, File.extname(driver)), options do  
+      $Log.info "Begin Pipelining #{driver} | #{Etc.getlogin} on #{`hostname`}"
+      run_pipe(options, driver)
+      $Log.info "Finished Pipelining #{driver}"
+    end
   end
-
 end
 
 # Perform Each of the Jobs in a Pipe
@@ -72,12 +76,10 @@ def setup_options
   end
 
   Trollop::die "Driver file not given" if (ARGV.size < 1)
-  driver = ARGV.shift
-  Trollop::die "Driver file #{driver} does not exist.  Check the path to that file and try again" unless File.exist?(driver)
 
   pp opts if opts[:debug]
   
-  return opts, driver
+  return opts
 end
 
 # Setup Tee IO's for Out and Error and start logs for them.
