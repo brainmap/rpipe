@@ -29,11 +29,11 @@ module DefaultRecon
     def convert_sequence(dicoms, outfile)
       local_scandir = File.dirname(dicoms.first)
       second_file = Dir.glob( File.join(local_scandir, "*0002*") )
-      glob = case second_file
-      when /.*\.\d*/
-        "*.[0-9]*"
-      else 
+      puts glob = case second_file
+      when /.*\.dcm$/
         "*.dcm"
+      else 
+        "*.[0-9]*"
       end
       wildcard = File.join(local_scandir, glob)
         

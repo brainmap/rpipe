@@ -26,13 +26,17 @@ EOS
 # Main Function for the CLI runner.
 def run!
   options = setup_options
-  drivers = *ARGV
-  while drivers.size > 1    
-    driver = drivers.pop
+  drivers = ARGV
+  while drivers.size >= 1    
+    driver = drivers.shift
     run_with_logging File.basename(driver, File.extname(driver)), options do  
-      $Log.info "Begin Pipelining #{driver} | #{Etc.getlogin} on #{`hostname`}"
-      run_pipe(options, driver)
-      $Log.info "Finished Pipelining #{driver}"
+      begin
+        $Log.info "Begin Pipelining #{driver} | #{Etc.getlogin} on #{`hostname`}"
+        run_pipe(options, driver)
+        $Log.info "Finished Pipelining #{driver}"
+      rescue StandardError => e
+        $Log.error e
+      end
     end
   end
 end

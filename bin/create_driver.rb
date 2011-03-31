@@ -16,9 +16,9 @@ def create!
   workflow_options = workflow_options_defaults.merge(spec_options).merge(cli_options[:config])
 
   # Create a Workflow Generator and use it to create configure job.
-  while ARGV.size > 1
+  while ARGV.size >= 1
     begin
-      rawdir = ARGV.pop
+      rawdir = ARGV.shift
       workflow = WorkflowGenerator.new(rawdir, workflow_options)
       if cli_options[:dry_run]
         pp workflow.build
