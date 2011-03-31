@@ -28,8 +28,8 @@ module DefaultRecon
     # Convert a folder of unzipped Dicom files to outfile
     def convert_sequence(dicoms, outfile)
       local_scandir = File.dirname(dicoms.first)
-      second_file = Dir.glob( File.join(local_scandir, "*0002*") )
-      puts glob = case second_file
+      second_file = Dir.glob( File.join(local_scandir, "*0002*") ).first
+      glob = case second_file
       when /.*\.dcm$/
         "*.dcm"
       else 
