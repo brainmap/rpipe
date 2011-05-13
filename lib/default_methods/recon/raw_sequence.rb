@@ -55,10 +55,11 @@ module DefaultRecon
     def timing_options(scan_spec, second_file)
       return "" if scan_spec['type'] == "anat"
       instance_offset = scan_spec['z_slices'] + 1
+      alt_direction = scan_spec['alt_direction'] ||= 'alt+z'
       if system("dicom_hdr #{second_file} | grep .*REL.Instance.*#{instance_offset}")
-        return "-epan -time:tz #{scan_spec['bold_reps']} #{scan_spec['z_slices']} 2000 alt+z"
+        return "-epan -time:tz %s %s 2000 %s" % [scan_spec['bold_reps'], scan_spec['z_slices'], alt_direction]
       else
-        return "-epan -time:zt #{scan_spec['z_slices']} #{scan_spec['bold_reps']} 2000 alt+z"
+        return "-epan -time:zt %s %s 2000 %s" % [scan_spec['z_slices'], scan_spec['bold_reps'], alt_direction]
       end
     end
   end

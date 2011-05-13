@@ -24,7 +24,7 @@ module DefaultRecon
           #   outfile = run_retroicor(scan_spec['physio_files'], outfile)
           # end
 				  
-					slice_time_correct(outfile)
+					slice_time_correct(outfile, scan_spec['alt_direction'] ||= 'alt+z')
 				else
 					File.copy('tmp.nii', outfile)
 				end
@@ -43,6 +43,7 @@ module DefaultRecon
 	def reconstruct_scan(scan_spec, outfile)	
 		if scan_spec['dir']
 		  sequence = DicomRawSequence.new(scan_spec, @rawdir)
+		  File.delete('tmp.nii') if File.exist? 'tmp.nii'
 		  sequence.prepare('tmp.nii')
 			strip_leading_volumes('tmp.nii', outfile, @volume_skip, scan_spec['bold_reps'])
 	  elsif scan_spec['pfile']
@@ -66,9 +67,9 @@ module DefaultRecon
 	end
 	
 	# Uses to3d to slice time correct a 4D functional nifti file.	 Writes result in the current working directory.
-	def slice_time_correct(infile)
+	def slice_time_correct(infile, alt_direction = "alt+z")
 		$Log.info "Slice Timing Correction: #{infile}"
-		cmd = "3dTshift -tzero 0 -tpattern alt+z -prefix a#{infile} #{infile}"
+		cmd = "3dTshift -tzero 0 -tpattern #{alt_direction} -prefix a#{infile} #{infile}"
 		unless run(cmd)
 		  raise ScriptError, "Failed to slice time correct: #{cmd}"
 	  end

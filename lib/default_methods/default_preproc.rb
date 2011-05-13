@@ -1,3 +1,4 @@
+# Shared preprocessing routines for rpipe 
 module DefaultPreproc
 	
 	# Runs the preprocessing job, including spm job customization, run spm job, and handling motion issues.
