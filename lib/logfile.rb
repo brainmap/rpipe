@@ -99,20 +99,31 @@ class Logfile
     File.stat(@textfile).mtime <=> File.stat(other_logfile.textfile).mtime
   end
   
+  # Write a summary table of logfiles to a CSV
+  # Arguments:
+  # * filename : String. Output Filename for CSV
+  # * directory : String. Directory to summarize (defaults to pwd).
+  # * grouping : String. Table attribute to group responses by. (defaults to 'version')
   def self.write_summary(filename = nil, directory = nil, grouping = nil)
     # One usage for this method is from the summarize_responses.rb executible,
     # which doesn't allow for ordered arguments on the fly.  Therefore,
     # assign defaults within the method itself, not the signature.
-    filename ||= 'tmp.csv'
+    filename ||= "logfile_summary.csv"
     directory ||= Dir.pwd
     grouping ||= 'version'
     
     table = self.summarize_directory(directory)
+    
     File.open(filename, 'w') do |f| 
       f.puts Ruport::Data::Grouping(table, :by => grouping).to_csv
     end
   end
-    
+  
+  # Create a Ruport::Data::Table containing summary data for a group of Behavioral logfiles.
+  # Arguments:
+  # * directory : String. Path to a directory to summarize.
+  # 
+  # Raises an IO Error if no logfiles were successfully summarized.
   def self.summarize_directory(directory)
     table = Ruport::Data::Table.new
     Dir.glob(File.join(directory, '*.txt')).each do |logfile| 
@@ -121,6 +132,10 @@ class Logfile
       table << lf.ruport_summary
       table.column_names = lf.summary_attributes if table.column_names.empty?
     end
+    
+    # Ensure that at least some logfiles were found and summarized.
+    raise IOError, "Couldn't find any logfiles in #{directory}" unless table.length >= 1
+    
     return table
   end
   

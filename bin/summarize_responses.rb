@@ -37,6 +37,15 @@ def parse_options
   end
   parser.parse!(ARGV)
   
+  unless ARGV.size == 0
+    puts parser, "\n"
+    
+    puts "Sorry, didn't recognize #{ARGV.join(' or ')}"
+    puts "Maybe add -f or -d?", "\n"
+
+    exit
+  end
+  
   return options
 end
 
