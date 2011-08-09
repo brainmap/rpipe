@@ -31,6 +31,8 @@ def create!
       end
     rescue StandardError => e
       puts "Problem creating driver for #{rawdir}"
+      puts e 
+      puts e.backtrace if cli_options[:verbose]
     end
   end
 end
@@ -80,6 +82,10 @@ def parse_options
     
     opts.on('-f', '--force', "Overwrite drivers if they exist.") do
       options[:force] = true
+    end
+    
+    opts.on('-v', '--verbose', "Print extra info.") do
+      options[:verbose] = true
     end
 
     opts.on_tail('-h', '--help', "Show this message")  { puts(parser); exit }
