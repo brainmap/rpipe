@@ -11,7 +11,7 @@ begin
     gem.homepage = "http://github.com/brainmap/rpipe"
     gem.authors = ["Kristopher Kosmatka", "Erik Kastman"]
     gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
-    gem.add_dependency "metamri"
+    gem.add_dependency "metamri", '~>0.2.8'
     gem.add_dependency "log4r"
     gem.add_dependency "POpen4"
     gem.add_dependency "ruport"
