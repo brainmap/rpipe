@@ -2,27 +2,6 @@ require 'rubygems'
 require 'rake'
 require 'bundler/gem_tasks'
 
-begin
-  require 'jeweler'
-  Jeweler::Tasks.new do |gem|
-    gem.name = "rpipe"
-    gem.summary = %Q{Neuroimaging preprocessing the Ruby way}
-    gem.description = %Q{Neuroimaging preprocessing the Ruby way}
-    gem.email = "kjkosmatka@gmail.com"
-    gem.homepage = "http://github.com/brainmap/rpipe"
-    gem.authors = ["Kristopher Kosmatka", "Erik Kastman"]
-    gem.add_development_dependency "thoughtbot-shoulda", ">= 0"
-    gem.add_dependency "metamri", '~>0.2.8'
-    gem.add_dependency "log4r"
-    gem.add_dependency "POpen4"
-    gem.add_dependency "ruport"
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
-  end
-  Jeweler::GemcutterTasks.new
-rescue LoadError
-  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
-end
-
 require 'rake/testtask'
 Rake::TestTask.new(:test) do |test|
   test.libs << 'lib' << 'test'
