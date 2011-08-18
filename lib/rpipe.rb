@@ -19,6 +19,10 @@ ENV['FSLOUTPUTTYPE'] = 'NIFTI'
 require 'default_logger'
 require 'global_additions'
 
+# Initial Definition of Rpipe Module for Bundler-style gemspec management.
+# TODO: Namespace this gem!
+module Rpipe; end
+
 class JobStep
 	
 	COLLISION_POLICY = :panic # options -- :panic, :destroy, :overwrite
