@@ -147,8 +147,6 @@ class Reconstruction < JobStep
 	require 'default_methods/default_recon'
 	include DefaultRecon
 	
-	VOLUME_SKIP = 3 # number of volumes to strip from beginning of functional scans.
-	
 	attr_accessor :scans, :volume_skip
 	
 	# Instances are initialized with a properly configured hash containing all the information needed to drive
@@ -156,7 +154,7 @@ class Reconstruction < JobStep
 	def initialize(workflow_spec, recon_spec)
 		super(workflow_spec, recon_spec)
 		raise ScriptError, "At least one scan must be specified." if @scans.nil?
-		@volume_skip = recon_spec['volume_skip'] || VOLUME_SKIP
+		@volume_skip = recon_spec['volume_skip']
 		
 		job_requires 'rawdir', 'origdir', 'scans'
 	end
