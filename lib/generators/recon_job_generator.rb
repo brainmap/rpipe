@@ -1,5 +1,5 @@
-gem 'activeresource', '<=2.3.8'
-$LOAD_PATH.unshift('~/projects/metamri/lib').unshift('~/code/metamri/lib')
+# gem 'activeresource', '<=2.3.8'
+# $LOAD_PATH.unshift('~/projects/metamri/lib').unshift('~/code/metamri/lib')
 require 'metamri'
 require 'generators/job_generator'
 

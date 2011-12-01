@@ -13,6 +13,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/brainmap/rpipe"
 
   s.add_development_dependency "thoughtbot-shoulda", ">= 0"
+  s.add_development_dependency "rspec", "~>1.3.2"
   s.add_dependency "metamri", '~>0.2.9'
   s.add_dependency "log4r", '~>1.1.9'
   s.add_dependency "POpen4", '~>0.1.4'
