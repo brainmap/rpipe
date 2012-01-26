@@ -4,7 +4,8 @@ require 'default_methods/recon/raw_sequence'
 # require 'default_methods/recon/physionoise_helper'
 
 module DefaultRecon
-	
+	DEFAULT_VOLUME_SKIP = 3 # Default number of volumes to strip from beginning of functional scans.
+
 	# Reconstructs, strips, and slice timing corrects all scans specified in the recon_spec.
 	# This function assumes a destination directory is set up in the filesystem and begins writing
 	# to it with no further checking.	 It will overwrite data if it already exists, be careful.
@@ -15,6 +16,9 @@ module DefaultRecon
 		Dir.chdir(@origdir) do		  
 			@scans.each_with_index do |scan_spec, i|
 				outfile = "%s_%s.nii" % [@subid, scan_spec['label']]
+				
+        # Set Discarded Acquisitions - Volumes to Skip from Recon Spec, Scan Spec or Default
+				@volumes_to_skip = @volume_skip || scan_spec['volume_skip'] || scan_spec['volumes_to_skip'] || DEFAULT_VOLUME_SKIP
 				
 				reconstruct_scan(scan_spec, outfile)
 				
@@ -42,30 +46,16 @@ module DefaultRecon
   # filenaming, I0002.dcm is second file in series,
 	def reconstruct_scan(scan_spec, outfile)	
 		if scan_spec['dir']
-		  sequence = DicomRawSequence.new(scan_spec, @rawdir)
-		  File.delete('tmp.nii') if File.exist? 'tmp.nii'
-		  sequence.prepare('tmp.nii')
-			strip_leading_volumes('tmp.nii', outfile, @volume_skip, scan_spec['bold_reps'])
+		  sequence = DicomRawSequence.new(scan_spec, @rawdir, @volumes_to_skip)
 	  elsif scan_spec['pfile']
-	    sequence = PfileRawSequence.new(scan_spec, @rawdir)
-	    sequence.prepare(outfile)
-    else 
+	    sequence = PfileRawSequence.new(scan_spec, @rawdir, @volumes_to_skip)
+    else
       raise ConfigError, "Scan must list either a pfile or a dicom directory."
     end
+    
+    sequence.prepare(outfile)
 	end
-	
-	# Removes the specified number of volumes from the beginning of a 4D functional nifti file.
-	# In most cases this will be 3 volumes. Writes result in current working directory.
-	def strip_leading_volumes(infile, outfile, volume_skip, bold_reps)
-		$Log.info "Stripping #{volume_skip.to_s} leading volumes: #{infile}"
-		cmd_fmt = "fslroi %s %s %s %s"
-		cmd_options = [infile, outfile, volume_skip.to_s, bold_reps.to_s]
-		cmd = cmd_fmt % cmd_options
-		unless run(cmd)
-		  raise ScriptError, "Failed to strip volumes: #{cmd}"
-	  end
-	end
-	
+		
 	# Uses to3d to slice time correct a 4D functional nifti file.	 Writes result in the current working directory.
 	def slice_time_correct(infile, alt_direction = "alt+z")
 		$Log.info "Slice Timing Correction: #{infile}"
