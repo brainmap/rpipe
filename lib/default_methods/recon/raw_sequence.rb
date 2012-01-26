@@ -4,10 +4,24 @@ module DefaultRecon
   # them from their raw state (dicoms or pfiles) to Nifti files suitable for
   # processing.
   class RawSequence
-    def initialize(scan_spec, rawdir)
+    def initialize(scan_spec, rawdir, volumes_to_skip)
       @scan_spec = scan_spec
       @rawdir = rawdir
+      @volumes_to_skip = volumes_to_skip
     end
+    
+    # Removes the specified number of volumes from the beginning of a 4D functional nifti file.
+  	# In most cases this will be 3 volumes. Writes result in current working directory.
+  	def strip_leading_volumes(infile, outfile, volume_skip, bold_reps)
+  		$Log.info "Stripping #{volume_skip.to_s} leading volumes: #{infile}"
+  		cmd_fmt = "fslroi %s %s %s %s"
+  		cmd_options = [infile, outfile, volume_skip.to_s, bold_reps.to_s]
+  		cmd = cmd_fmt % cmd_options
+  		unless run(cmd)
+  		  raise ScriptError, "Failed to strip volumes: #{cmd}"
+  	  end
+  	end
+  	
   end
 
   # Manage a folder of Raw Dicoms for Nifti file conversion
@@ -16,9 +30,14 @@ module DefaultRecon
     def prepare_and_convert_sequence(outfile)
       @scandir = File.join(@rawdir, @scan_spec['dir'])
       $Log.info "Dicom Reconstruction: #{@scandir}"
+      
+      File.delete('tmp.nii') if File.exist? 'tmp.nii'
+      
       Pathname.new(@scandir).all_dicoms do |dicoms|
-        convert_sequence(dicoms, outfile)
+        convert_sequence(dicoms, 'tmp.nii')
       end
+      
+      strip_leading_volumes('tmp.nii', outfile, @volumes_to_skip, @scan_spec['bold_reps'])
     end
       
     alias_method :prepare, :prepare_and_convert_sequence
@@ -67,8 +86,8 @@ module DefaultRecon
   # Reconstucts a PFile from Raw to Nifti File
   class PfileRawSequence < RawSequence
     # Create a local unzipped copy of the Pfile and prepare Scanner Reference Data for reconstruction
-    def initialize(scan_spec, rawdir)
-      super(scan_spec, rawdir)
+    def initialize(scan_spec, rawdir, volumes_to_skip)
+      super(scan_spec, rawdir, volumes_to_skip)
       
       base_pfile_path = File.join(@rawdir, @scan_spec['pfile'])
       pfile_path = File.exist?(base_pfile_path) ? base_pfile_path : base_pfile_path + '.bz2'
@@ -86,9 +105,8 @@ module DefaultRecon
     # Outfile may include a '.nii' extension - a nifti file will be constructed
     # directly in this case.
     def reconstruct_sequence(outfile)
-      volumes_to_skip = @scan_spec['volumes_to_skip'] ||= 3
       epirecon_cmd_format = "epirecon_ex -f %s -NAME %s -skip %d -scltype=0"
-      epirecon_cmd_options = [@pfile_data, outfile, volumes_to_skip]
+      epirecon_cmd_options = [@pfile_data, outfile, @volumes_to_skip]
       epirecon_cmd = epirecon_cmd_format % epirecon_cmd_options
 			raise ScriptError, "Problem running #{epirecon_cmd}" unless run(epirecon_cmd)
     end
