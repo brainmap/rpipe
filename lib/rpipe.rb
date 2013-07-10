@@ -127,7 +127,7 @@ class JobStep
   end
   
   def default_spmdir
-    spmdirs = %w{/Applications/spm/spm8/spm8_current /apps/spm/spm8_current}
+    spmdirs = %w{/Applications/spm/spm8/spm8_current /apps/spm/spm8/spm8_current}
     spmdirs.each do |dir|
       return dir if File.directory? dir
     end
